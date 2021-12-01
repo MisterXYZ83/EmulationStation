@@ -117,7 +117,7 @@ void Settings::setDefaults()
 	mStringMap["SlideshowScreenSaverImageDir"] = Utils::FileSystem::getHomePath() + "/.emulationstation/slideshow/image";
 	mStringMap["SlideshowScreenSaverImageFilter"] = ".png,.jpg";
 	mBoolMap["SlideshowScreenSaverRecurse"] = false;
-
+	
 	// This setting only applies to raspberry pi but set it for all platforms so
 	// we don't get a warning if we encounter it on a different platform
 	mBoolMap["VideoOmxPlayer"] = false;
@@ -177,6 +177,8 @@ void Settings::setDefaults()
 	//No spaces!  Order is important!
 	//"The A Squad" given [a,an,the] will sort as "A Squad", but given [the,a,an] will sort as "Squad"
 	mStringMap["LeadingArticles"] = "a,an,the";
+	
+	mStringMap["SplashScreenPath"] = ":/splash.svg";
 }
 
 template <typename K, typename V>
