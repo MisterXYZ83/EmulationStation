@@ -311,7 +311,7 @@ void Window::renderLoadingScreen(std::string text, float percent, unsigned char 
 	Renderer::setMatrix(trans);
 	Renderer::drawRect(0.0f, 0.0f, Renderer::getScreenWidth(), Renderer::getScreenHeight(), 0x000000FF, 0x000000FF);
 	char *splashPath = 0;
-	
+
 	if (percent >= 0)
 	{
 		float baseHeight = 0.04f;
@@ -328,7 +328,7 @@ void Window::renderLoadingScreen(std::string text, float percent, unsigned char 
 
 	ImageComponent splash(this, true);
 	splash.setResize(Renderer::getScreenWidth() * 0.6f, 0.0f);
-	
+
 	//splash.setImage(":/splash.svg");
 	splashPath = (char *)Settings::getInstance()->getInt("SplashScreenPath");
 	splash.setImage(splashPath);
