@@ -167,6 +167,7 @@ public:
 
 	static std::map<std::string, ThemeSet> getThemeSets();
 	static std::string getThemeFromCurrentSet(const std::string& system);
+	int getLedColor(){return mLedColor;}
 
 private:
 	static std::map< std::string, std::map<std::string, ElementPropertyType> > sElementMap;

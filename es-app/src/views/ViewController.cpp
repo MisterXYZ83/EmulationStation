@@ -17,6 +17,8 @@
 #include "SystemData.h"
 #include "Window.h"
 
+#include "leds.h"
+
 ViewController* ViewController::sInstance = NULL;
 
 ViewController* ViewController::get()
@@ -159,16 +161,43 @@ void ViewController::playViewTransition()
 		// stop whatever's currently playing, leaving mFadeOpacity wherever it is
 		cancelAnimation(0);
 
-		auto fadeFunc = [this](float t) {
+		if ( mState.system && mState.system->getTheme() )
+		{
+			int col = mState.system->getTheme()->getLedColor();
+
+			Led_Controller.R = (col & 0xFF0000) >> 16;
+			Led_Controller.G = (col & 0x00FF00) >> 8;
+			Led_Controller.B = (col & 0x0000FF) >> 0;
+		}
+
+		auto fadeInFunc = [this](float t) {
 			mFadeOpacity = Math::lerp(0, 1, t);
+
+			if ( Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
+										(unsigned char)(Math::lerp(1,0,t) * Led_Controller.R_Old),
+				      	      			(unsigned char)(Math::lerp(1,0,t) * Led_Controller.G_Old),
+				              			(unsigned char)(Math::lerp(1,0,t) * Led_Controller.B_Old) );
+		};
+
+		auto fadeOutFunc = [this](float t) {
+			mFadeOpacity = Math::lerp(0, 1, t);
+
+			if ( Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
+											(unsigned char)(Math::lerp(1,0,t) * Led_Controller.R),
+											(unsigned char)(Math::lerp(1,0,t) * Led_Controller.G),
+			                      			(unsigned char)(Math::lerp(1,0,t) * Led_Controller.B) );
 		};
 
 		const static int FADE_DURATION = 240; // fade in/out time
 		const static int FADE_WAIT = 320; // time to wait between in/out
-		setAnimation(new LambdaAnimation(fadeFunc, FADE_DURATION), 0, [this, fadeFunc, target] {
+		setAnimation(new LambdaAnimation(fadeInFunc, FADE_DURATION), 0, [this, fadeOutFunc, target] {
 			this->mCamera.translation() = -target;
 			updateHelpPrompts();
-			setAnimation(new LambdaAnimation(fadeFunc, FADE_DURATION), FADE_WAIT, nullptr, true);
+			setAnimation(new LambdaAnimation(fadeOutFunc, FADE_DURATION), FADE_WAIT, [this]{
+				Led_Controller.R_Old = Led_Controller.R;
+				Led_Controller.G_Old = Led_Controller.G;
+				Led_Controller.B_Old = Led_Controller.B;
+			}, true);
 		});
 
 		// fast-forward animation if we're partway faded

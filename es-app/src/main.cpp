@@ -27,6 +27,7 @@
 #endif
 
 #include <FreeImage.h>
+#include "leds.h"
 
 bool scrape_cmdline = false;
 
@@ -256,10 +257,21 @@ void onExit()
 
 int main(int argc, char* argv[])
 {
+	int base_ch, led_active, led_mode;
+
+	srand((unsigned int)time(NULL));
+
 	std::locale::global(std::locale("C"));
 
 	if(!parseArgs(argc, argv))
 		return 0;
+
+	led_active = Settings::getInstance()->getInt("LedActive");
+	base_ch = Settings::getInstance()->getInt("LedBaseChannel");
+	led_mode = Settings::getInstance()->getInt("LedOutputMode");
+	Init_Led_Driver();
+
+	Init_Leds(led_active, base_ch, led_mode);
 
 	// only show the console on Windows if HideConsole is false
 #ifdef WIN32

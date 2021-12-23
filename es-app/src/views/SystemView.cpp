@@ -9,6 +9,8 @@
 #include "SystemData.h"
 #include "Window.h"
 
+#include "leds.h"
+
 // buffer values for scrolling velocity (left, stopped, right)
 const int logoBuffersLeft[] = { -5, -2, -1 };
 const int logoBuffersRight[] = { 1, 2, 5 };
@@ -212,7 +214,7 @@ void SystemView::update(int deltaTime)
 	GuiComponent::update(deltaTime);
 }
 
-void SystemView::onCursorChanged(const CursorState& /*state*/)
+void SystemView::onCursorChanged(const CursorState& state)
 {
 	// update help style
 	updateHelpPrompts();
@@ -243,14 +245,24 @@ void SystemView::onCursorChanged(const CursorState& /*state*/)
 	bool goFast = transition_style == "instant";
 	const float infoStartOpacity = mSystemInfo.getOpacity() / 255.f;
 
+	int r,g,b;
+	int old_col = 0;
+
 	Animation* infoFadeOut = new LambdaAnimation(
-		[infoStartOpacity, this] (float t)
+		[infoStartOpacity, r, g, b, this] (float t)
 	{
 		mSystemInfo.setOpacity((unsigned char)(Math::lerp(infoStartOpacity, 0.f, t) * 255));
-	}, (int)(infoStartOpacity * (goFast ? 10 : 150)));
+
+		//provo a fare un fade out sui led, colore rosso
+		if (Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
+									(unsigned char)(Math::lerp(1.0f, 0.0f, t) * Led_Controller.R_Old),
+			      					(unsigned char)(Math::lerp(1.0f, 0.0f, t) * Led_Controller.G_Old),
+			      					(unsigned char)(Math::lerp(1.0f, 0.0f, t) * Led_Controller.B_Old));
+
+	}, (int)(infoStartOpacity * (goFast ? 10 : 150)));  //10 : 150
 
 	unsigned int gameCount = getSelected()->getDisplayedGameCount();
-
+	
 	// also change the text after we've fully faded out
 	setAnimation(infoFadeOut, 0, [this, gameCount] {
 		std::stringstream ss;
@@ -263,14 +275,30 @@ void SystemView::onCursorChanged(const CursorState& /*state*/)
 		mSystemInfo.setText(ss.str());
 	}, false, 1);
 
+	//colore destinazione
+	int new_col = getSelected()->getTheme()->getLedColor();
+
+	Led_Controller.R = (new_col & 0xFF0000) >> 16;
+	Led_Controller.G = (new_col & 0x00FF00) >> 8;
+	Led_Controller.B = (new_col & 0x0000FF) >> 0;
+
 	Animation* infoFadeIn = new LambdaAnimation(
-		[this](float t)
+		[this, r, g, b](float t)
 	{
 		mSystemInfo.setOpacity((unsigned char)(Math::lerp(0.f, 1.f, t) * 255));
-	}, goFast ? 10 : 300);
+
+		if (Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
+									(unsigned char)(Math::lerp(0.0f, 1.0f, t) * Led_Controller.R),
+			      					(unsigned char)(Math::lerp(0.0f, 1.0f, t) * Led_Controller.G),
+			      					(unsigned char)(Math::lerp(0.0f, 1.0f, t) * Led_Controller.B));
+	}, goFast ? 10 : 300);   //10 : 300
 
 	// wait 600ms to fade in
-	setAnimation(infoFadeIn, goFast ? 0 : 2000, nullptr, false, 2);
+	setAnimation(infoFadeIn, goFast ? 0 : 1000, [this]{
+		Led_Controller.R_Old = Led_Controller.R;
+		Led_Controller.G_Old = Led_Controller.G;
+		Led_Controller.B_Old = Led_Controller.B;
+	}, false, 2);
 
 	// no need to animate transition, we're not going anywhere (probably mEntries.size() == 1)
 	if(endPos == mCamOffset && endPos == mExtrasCamOffset)
