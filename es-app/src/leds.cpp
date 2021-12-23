@@ -2,6 +2,7 @@
 #include<dlfcn.h>
 #include "ftd2xx.h"
 #include "libMPSSE_i2c.h"
+#include <string.h>
 #include "leds.h"
 
 /******************************************************************************/
@@ -105,8 +106,7 @@ void Init_Leds(int active, int base_ch, int mode)
 	memset(&Led_Controller, 0, sizeof(T_Led_Controller));
 	
 	if ( !active ) return;
-	
-	if (!initialize_library()) return;
+	if (!Init_Led_Driver()) return;
 
 	memset(&channelConf, 0, sizeof(channelConf));
 	channelConf.ClockRate = I2C_CLOCK_FAST_MODE;
