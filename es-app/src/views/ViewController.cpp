@@ -188,7 +188,7 @@ void ViewController::playViewTransition()
 											(unsigned char)(Math::lerp(1,0,t) * Led_Controller.R),
 											(unsigned char)(Math::lerp(1,0,t) * Led_Controller.G),
 			                      			(unsigned char)(Math::lerp(1,0,t) * Led_Controller.B),
-											(unsigned char)(Math::lerp(1,0,t) * Led_Controller.W);
+											(unsigned char)(Math::lerp(1,0,t) * Led_Controller.W));
 		};
 
 		const static int FADE_DURATION = 240; // fade in/out time
