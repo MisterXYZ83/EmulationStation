@@ -38,10 +38,10 @@ static pfunc_FT_WriteGPIO p_FT_WriteGPIO = NULL;
 static pfunc_FT_ReadGPIO  p_FT_ReadGPIO = NULL;
 
 static FT_HANDLE ftHandle;
-static uint8 buffer[I2C_DEVICE_BUFFER_SIZE] = {0};
+static uint8 buffer[100] = {0};
 static uint8 pca9685_regs[256] = {0};
 
-static T_Led_Controller Led_Controller;
+T_Led_Controller Led_Controller;
 
 uint8 Init_Led_Driver()
 {
@@ -50,7 +50,7 @@ uint8 Init_Led_Driver()
 	
 	if(!h_libMPSSE)
 	{
-		printf("Failed loading libMPSSE.so. Please check if the file exists in the shared library folder(/usr/lib or /usr/lib64)\n");
+		//printf("Failed loading libMPSSE.so. Please check if the file exists in the shared library folder(/usr/lib or /usr/lib64)\n");
 		exit(1);
 	}
 
