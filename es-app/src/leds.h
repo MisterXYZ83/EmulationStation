@@ -13,11 +13,13 @@ typedef struct
 	int R;
 	int G;
 	int B;
-
+	int W;
+	
 	int R_Old;
 	int G_Old;
 	int B_Old;
-
+	int W_Old;
+	
 	int Active;
 
 } T_Led_Controller;

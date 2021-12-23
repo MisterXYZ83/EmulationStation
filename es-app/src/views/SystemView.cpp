@@ -245,11 +245,11 @@ void SystemView::onCursorChanged(const CursorState& state)
 	bool goFast = transition_style == "instant";
 	const float infoStartOpacity = mSystemInfo.getOpacity() / 255.f;
 
-	int r,g,b;
+	int r,g,b,w;
 	int old_col = 0;
 
 	Animation* infoFadeOut = new LambdaAnimation(
-		[infoStartOpacity, r, g, b, this] (float t)
+		[infoStartOpacity, r, g, b, w, this] (float t)
 	{
 		mSystemInfo.setOpacity((unsigned char)(Math::lerp(infoStartOpacity, 0.f, t) * 255));
 
@@ -257,7 +257,8 @@ void SystemView::onCursorChanged(const CursorState& state)
 		if (Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
 									(unsigned char)(Math::lerp(1.0f, 0.0f, t) * Led_Controller.R_Old),
 			      					(unsigned char)(Math::lerp(1.0f, 0.0f, t) * Led_Controller.G_Old),
-			      					(unsigned char)(Math::lerp(1.0f, 0.0f, t) * Led_Controller.B_Old));
+			      					(unsigned char)(Math::lerp(1.0f, 0.0f, t) * Led_Controller.B_Old),
+									(unsigned char)(Math::lerp(1.0f, 0.0f, t) * Led_Controller.W_Old));
 
 	}, (int)(infoStartOpacity * (goFast ? 10 : 150)));  //10 : 150
 
@@ -277,10 +278,11 @@ void SystemView::onCursorChanged(const CursorState& state)
 
 	//colore destinazione
 	int new_col = getSelected()->getTheme()->getLedColor();
-
-	Led_Controller.R = (new_col & 0xFF0000) >> 16;
-	Led_Controller.G = (new_col & 0x00FF00) >> 8;
-	Led_Controller.B = (new_col & 0x0000FF) >> 0;
+	
+	Led_Controller.W = (new_col & 0xFF000000) >> 24;
+	Led_Controller.R = (new_col & 0x00FF0000) >> 16;
+	Led_Controller.G = (new_col & 0x0000FF00) >> 8;
+	Led_Controller.B = (new_col & 0x000000FF) >> 0;
 
 	Animation* infoFadeIn = new LambdaAnimation(
 		[this, r, g, b](float t)
@@ -290,7 +292,8 @@ void SystemView::onCursorChanged(const CursorState& state)
 		if (Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
 									(unsigned char)(Math::lerp(0.0f, 1.0f, t) * Led_Controller.R),
 			      					(unsigned char)(Math::lerp(0.0f, 1.0f, t) * Led_Controller.G),
-			      					(unsigned char)(Math::lerp(0.0f, 1.0f, t) * Led_Controller.B));
+			      					(unsigned char)(Math::lerp(0.0f, 1.0f, t) * Led_Controller.B),
+									(unsigned char)(Math::lerp(0.0f, 1.0f, t) * Led_Controller.W)									);
 	}, goFast ? 10 : 300);   //10 : 300
 
 	// wait 600ms to fade in
@@ -298,6 +301,7 @@ void SystemView::onCursorChanged(const CursorState& state)
 		Led_Controller.R_Old = Led_Controller.R;
 		Led_Controller.G_Old = Led_Controller.G;
 		Led_Controller.B_Old = Led_Controller.B;
+		Led_Controller.W_Old = Led_Controller.W;
 	}, false, 2);
 
 	// no need to animate transition, we're not going anywhere (probably mEntries.size() == 1)
