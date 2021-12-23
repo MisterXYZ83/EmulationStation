@@ -97,7 +97,7 @@ void Write_I2C_Data(uint8 slaveAddress, uint8 registerAddress, const uint8 *data
 	p_I2C_DeviceWrite(ftHandle, slaveAddress, bytesToTransfer, buffer, &bytesTransfered, options);
 }
 
-void Init_Leds(int active, int base_ch, int mode)
+void Init_Led_Controller(int active, int base_ch, int mode)
 {
 	ChannelConfig channelConf;
 	uint32 channels = 0;
