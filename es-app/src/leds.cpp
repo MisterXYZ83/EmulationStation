@@ -74,11 +74,6 @@ uint8 Init_Led_Driver()
 	CHECK_ERROR(p_FT_WriteGPIO);
 	CHECK_ERROR(p_FT_ReadGPIO);*/
 
-	memset(&Led_Controller, 0, sizeof(T_Led_Controller));
-
-	Led_Controller.BaseChannel = base_ch;
-	Led_Controller.Active = active;
-
 	return 1;
 }
 
