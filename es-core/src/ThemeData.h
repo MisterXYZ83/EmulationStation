@@ -178,6 +178,8 @@ private:
 	float mVersion;
 	Vector2f mResolution;
 
+	int mLedColor;
+
 	void parseFeatures(const pugi::xml_node& themeRoot);
 	void parseIncludes(const pugi::xml_node& themeRoot);
 	void parseVariables(const pugi::xml_node& root);
