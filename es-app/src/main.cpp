@@ -269,9 +269,9 @@ int main(int argc, char* argv[])
 	led_active = Settings::getInstance()->getInt("LedActive");
 	base_ch = Settings::getInstance()->getInt("LedBaseChannel");
 	led_mode = Settings::getInstance()->getInt("LedOutputMode");
+	
 	Init_Led_Driver();
-
-	Init_Leds(led_active, base_ch, led_mode);
+	Init_Led_Controller(led_active, base_ch, led_mode);
 
 	// only show the console on Windows if HideConsole is false
 #ifdef WIN32

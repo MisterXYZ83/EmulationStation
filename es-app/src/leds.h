@@ -3,7 +3,7 @@
 
 #define MAX_PWM 4096
 
-extern uint8 Init_Led_Driver(void);
+extern unsigned char Init_Led_Driver(void);
 extern void Init_Led_Controller(int active, int base_ch, int mode);
 
 typedef struct
