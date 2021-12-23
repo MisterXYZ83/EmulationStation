@@ -165,9 +165,10 @@ void ViewController::playViewTransition()
 		{
 			int col = mState.system->getTheme()->getLedColor();
 
-			Led_Controller.R = (col & 0xFF0000) >> 16;
-			Led_Controller.G = (col & 0x00FF00) >> 8;
-			Led_Controller.B = (col & 0x0000FF) >> 0;
+			Led_Controller.W = (col & 0xFF000000) >> 24;
+			Led_Controller.R = (col & 0x00FF0000) >> 16;
+			Led_Controller.G = (col & 0x0000FF00) >> 8;
+			Led_Controller.B = (col & 0x000000FF) >> 0;
 		}
 
 		auto fadeInFunc = [this](float t) {
@@ -176,7 +177,8 @@ void ViewController::playViewTransition()
 			if ( Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
 										(unsigned char)(Math::lerp(1,0,t) * Led_Controller.R_Old),
 				      	      			(unsigned char)(Math::lerp(1,0,t) * Led_Controller.G_Old),
-				              			(unsigned char)(Math::lerp(1,0,t) * Led_Controller.B_Old) );
+				              			(unsigned char)(Math::lerp(1,0,t) * Led_Controller.B_Old),
+										(unsigned char)(Math::lerp(1,0,t) * Led_Controller.W_Old));
 		};
 
 		auto fadeOutFunc = [this](float t) {
@@ -185,7 +187,8 @@ void ViewController::playViewTransition()
 			if ( Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
 											(unsigned char)(Math::lerp(1,0,t) * Led_Controller.R),
 											(unsigned char)(Math::lerp(1,0,t) * Led_Controller.G),
-			                      			(unsigned char)(Math::lerp(1,0,t) * Led_Controller.B) );
+			                      			(unsigned char)(Math::lerp(1,0,t) * Led_Controller.B),
+											(unsigned char)(Math::lerp(1,0,t) * Led_Controller.W);
 		};
 
 		const static int FADE_DURATION = 240; // fade in/out time
@@ -197,6 +200,7 @@ void ViewController::playViewTransition()
 				Led_Controller.R_Old = Led_Controller.R;
 				Led_Controller.G_Old = Led_Controller.G;
 				Led_Controller.B_Old = Led_Controller.B;
+				Led_Controller.W_Old = Led_Controller.W;
 			}, true);
 		});
 
