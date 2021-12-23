@@ -8,15 +8,14 @@
 /*								Macro and type defines							   */
 /******************************************************************************/
 #define GET_FUN_POINTER	dlsym
-#define CHECK_ERROR(exp) {if(dlerror() != NULL){printf("line %d: ERROR \
-	dlsym\n",__LINE__);}}
+/*#define CHECK_ERROR(exp) {if(dlerror() != NULL){printf("line %d: ERROR dlsym\n",__LINE__);}}
 
 #define APP_CHECK_STATUS(exp) {if(exp!=FT_OK){printf("%s:%d:%s(): status(0x%x) \
 	!= FT_OK\n",__FILE__, __LINE__, __FUNCTION__,exp);exit(1);}else{;}};
 #define APP_CHECK_STATUS_NOEXIT(exp) {if(exp!=FT_OK){printf("%s:%d:%s(): status(0x%x) \
 	!= FT_OK\n",__FILE__, __LINE__, __FUNCTION__,exp);}else{;}};
 #define CHECK_NULL(exp){if(exp==NULL){printf("%s:%d:%s():  NULL expression \
-	encountered \n",__FILE__, __LINE__, __FUNCTION__);exit(1);}else{;}};
+	encountered \n",__FILE__, __LINE__, __FUNCTION__);exit(1);}else{;}};*/
 	
 typedef FT_STATUS(*pfunc_I2C_GetNumChannels)(uint32 *numChannels);
 typedef FT_STATUS(*pfunc_I2C_GetChannelInfo)(uint32 index, FT_DEVICE_LIST_INFO_NODE *chanInfo);
@@ -51,7 +50,7 @@ uint8 Init_Led_Driver()
 	if(!h_libMPSSE)
 	{
 		//printf("Failed loading libMPSSE.so. Please check if the file exists in the shared library folder(/usr/lib or /usr/lib64)\n");
-		exit(1);
+		return 0;
 	}
 
 	p_I2C_GetNumChannels = (pfunc_I2C_GetNumChannels)GET_FUN_POINTER(h_libMPSSE, "I2C_GetNumChannels");
@@ -64,7 +63,7 @@ uint8 Init_Led_Driver()
 	p_FT_WriteGPIO = (pfunc_FT_WriteGPIO)GET_FUN_POINTER(h_libMPSSE, "FT_WriteGPIO");
 	p_FT_ReadGPIO = (pfunc_FT_ReadGPIO)GET_FUN_POINTER(h_libMPSSE, "FT_ReadGPIO");
 
-	CHECK_ERROR(p_I2C_GetNumChannels);
+	/*CHECK_ERROR(p_I2C_GetNumChannels);
 	CHECK_ERROR(p_I2C_GetChannelInfo);
 	CHECK_ERROR(p_I2C_OpenChannel);
 	CHECK_ERROR(p_I2C_CloseChannel);
@@ -72,7 +71,7 @@ uint8 Init_Led_Driver()
 	CHECK_ERROR(p_I2C_DeviceRead);
 	CHECK_ERROR(p_I2C_DeviceWrite);
 	CHECK_ERROR(p_FT_WriteGPIO);
-	CHECK_ERROR(p_FT_ReadGPIO);
+	CHECK_ERROR(p_FT_ReadGPIO);*/
 
 	memset(&Led_Controller, 0, sizeof(T_Led_Controller));
 
