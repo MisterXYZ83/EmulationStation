@@ -65,7 +65,7 @@ void GuiMenu::openLedSettings()
 		s->addSaveFunc([marquee_w] 
 		{ 
 			int c = Settings::getInstance()->getInt("LedMarqueeColor");
-			int v = (int)(marquee_w->value * 255.0f);
+			int v = (int)(marquee_w->getValue() * 255.0f);
 			
 			c &= ~(0xFF000000);
 			c |= (v << 24);
@@ -87,7 +87,7 @@ void GuiMenu::openLedSettings()
 		s->addSaveFunc([marquee_r] 
 		{ 
 			int c = Settings::getInstance()->getInt("LedMarqueeColor");
-			int v = (int)(marquee_r->value * 255.0f);
+			int v = (int)(marquee_r->getValue() * 255.0f);
 			
 			c &= ~(0x00FF0000);
 			c |= (v << 16);
@@ -109,7 +109,7 @@ void GuiMenu::openLedSettings()
 		s->addSaveFunc([marquee_g] 
 		{ 
 			int c = Settings::getInstance()->getInt("LedMarqueeColor");
-			int v = (int)(marquee_g->value * 255.0f);
+			int v = (int)(marquee_g->getValue() * 255.0f);
 			
 			c &= ~(0x0000FF00);
 			c |= (v << 8);
@@ -131,7 +131,7 @@ void GuiMenu::openLedSettings()
 		s->addSaveFunc([marquee_b] 
 		{ 
 			int c = Settings::getInstance()->getInt("LedMarqueeColor");
-			int v = (int)(marquee_b->value * 255.0f);
+			int v = (int)(marquee_b->getValue() * 255.0f);
 			
 			c &= ~(0x000000FF);
 			c |= (v << 0);
