@@ -257,6 +257,9 @@ void ThemeData::loadFile(std::map<std::string, std::string> sysDataMap, const st
 	if(mVersion < MINIMUM_THEME_FORMAT_VERSION)
 		throw error << "Theme uses format version " << mVersion << ". Minimum supported version is " << MINIMUM_THEME_FORMAT_VERSION << ".";
 
+	//tema led
+	mLedColor = root.child("led").text().as_uint(0x00000000);
+	
 	// parse resolution
 	std::string resolution = root.child("resolution").text().as_string("");
 
