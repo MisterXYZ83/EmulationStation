@@ -200,7 +200,7 @@ void ViewController::playViewTransition()
 
 			if (Led_Controller.Active )
 			{
-				for ( int strip = 0 ; strip < 4 ; strip++ )
+				for ( int s = 0 ; s < 4 ; s++ )
 				{	
 					if ( !Led_Controller.Strips[s].IsMarquee ) 
 					{
@@ -227,7 +227,7 @@ void ViewController::playViewTransition()
 
 			if (Led_Controller.Active )
 			{
-				for ( int strip = 0 ; strip < 4 ; strip++ )
+				for ( int s = 0 ; s < 4 ; s++ )
 				{	
 					if ( !Led_Controller.Strips[s].IsMarquee ) 
 					{
