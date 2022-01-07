@@ -41,7 +41,7 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 		addEntry("SOUND SETTINGS", 0x777777FF, true, [this] { openSoundSettings(); });
 	}
 	
-	addEntry("LEDs"), 0x777777FF, true, [this] {openLedSettings(); });
+	addEntry("LEDs", 0x777777FF, true, [this] {openLedSettings(); });
 	addEntry("QUIT", 0x777777FF, true, [this] {openQuitMenu(); });
 
 	addChild(&mMenu);
