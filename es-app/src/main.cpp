@@ -280,9 +280,9 @@ int main(int argc, char* argv[])
 		Led_Controller.Strips[marquee_strip-1].IsMarquee = 1;
 		
 		Led_Controller.Strips[marquee_strip-1].W = (marquee_color & 0xFF000000) >> 24;
-		Led_Controller.Strips[marquee_strip-1].W = (marquee_color & 0x00FF0000) >> 16;
-		Led_Controller.Strips[marquee_strip-1].W = (marquee_color & 0x0000FF00) >>  8;
-		Led_Controller.Strips[marquee_strip-1].W = (marquee_color & 0x000000FF) >>  0;
+		Led_Controller.Strips[marquee_strip-1].R = (marquee_color & 0x00FF0000) >> 16;
+		Led_Controller.Strips[marquee_strip-1].G = (marquee_color & 0x0000FF00) >>  8;
+		Led_Controller.Strips[marquee_strip-1].B = (marquee_color & 0x000000FF) >>  0;
 	}
 	
 	//accendo il marquee
