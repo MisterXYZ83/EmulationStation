@@ -167,7 +167,7 @@ public:
 
 	static std::map<std::string, ThemeSet> getThemeSets();
 	static std::string getThemeFromCurrentSet(const std::string& system);
-	int getLedColor(){return mLedColor;}
+	int getLedColor(int s){return mLedColor[s];}
 
 private:
 	static std::map< std::string, std::map<std::string, ElementPropertyType> > sElementMap;
@@ -178,7 +178,7 @@ private:
 	float mVersion;
 	Vector2f mResolution;
 
-	int mLedColor;
+	int mLedColor[1+4];
 
 	void parseFeatures(const pugi::xml_node& themeRoot);
 	void parseIncludes(const pugi::xml_node& themeRoot);

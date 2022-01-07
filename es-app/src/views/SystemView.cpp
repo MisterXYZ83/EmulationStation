@@ -245,21 +245,27 @@ void SystemView::onCursorChanged(const CursorState& state)
 	bool goFast = transition_style == "instant";
 	const float infoStartOpacity = mSystemInfo.getOpacity() / 255.f;
 
-	int r,g,b,w;
-	int old_col = 0;
-
 	Animation* infoFadeOut = new LambdaAnimation(
 		[infoStartOpacity, r, g, b, w, this] (float t)
 	{
+		float c_coeff = Math::lerp(1.0f, 0.0f, t);
 		mSystemInfo.setOpacity((unsigned char)(Math::lerp(infoStartOpacity, 0.f, t) * 255));
-
-		//provo a fare un fade out sui led, colore rosso
-		if (Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
-									(unsigned char)(Math::lerp(1.0f, 0.0f, t) * Led_Controller.R_Old),
-			      					(unsigned char)(Math::lerp(1.0f, 0.0f, t) * Led_Controller.G_Old),
-			      					(unsigned char)(Math::lerp(1.0f, 0.0f, t) * Led_Controller.B_Old),
-									(unsigned char)(Math::lerp(1.0f, 0.0f, t) * Led_Controller.W_Old));
-
+		
+		if (Led_Controller.Active )
+		{
+			for ( int strip = 0 ; strip < 4 ; strip++ )
+			{	
+				if ( !Led_Controller.Strips[s].IsMarquee ) 
+				{
+					Write_Strip(s, 
+						(unsigned char)(c_coeff * Led_Controller.Strips[s].R_Old), 
+						(unsigned char)(c_coeff * Led_Controller.Strips[s].G_Old), 
+						(unsigned char)(c_coeff * Led_Controller.Strips[s].B_Old), 
+						(unsigned char)(c_coeff * Led_Controller.Strips[s].W_Old));
+				}
+			}
+		}	
+		
 	}, (int)(infoStartOpacity * (goFast ? 10 : 150)));  //10 : 150
 
 	unsigned int gameCount = getSelected()->getDisplayedGameCount();
@@ -277,31 +283,72 @@ void SystemView::onCursorChanged(const CursorState& state)
 	}, false, 1);
 
 	//colore destinazione
-	int new_col = getSelected()->getTheme()->getLedColor();
+	int led_col[5] = {0};
 	
-	Led_Controller.W = (new_col & 0xFF000000) >> 24;
-	Led_Controller.R = (new_col & 0x00FF0000) >> 16;
-	Led_Controller.G = (new_col & 0x0000FF00) >> 8;
-	Led_Controller.B = (new_col & 0x000000FF) >> 0;
+	led_col[0] = getSelected()->getTheme()->getLedColor(0);
+	led_col[1] = getSelected()->getTheme()->getLedColor(1);
+	led_col[2] = getSelected()->getTheme()->getLedColor(2);
+	led_col[3] = getSelected()->getTheme()->getLedColor(3);
+	led_col[4] = getSelected()->getTheme()->getLedColor(4);
+	
+	for ( int s = 0; s < 4 ; s++ )
+	{
+		if ( Led_Controller.Strips[s].IsMarquee ) continue;
+		
+		if ( led_col[0] != 0 )
+		{
+			Led_Controller.Strips[s].W = (led_col[0] & 0xFF000000) >> 24;
+			Led_Controller.Strips[s].R = (led_col[0] & 0x00FF0000) >> 16;
+			Led_Controller.Strips[s].G = (led_col[0] & 0x0000FF00) >> 8;
+			Led_Controller.Strips[s].B = (led_col[0] & 0x000000FF) >> 0;
+		}
+		else
+		{
+			Led_Controller.Strips[s].W = (led_col[s+1] & 0xFF000000) >> 24;
+			Led_Controller.Strips[s].R = (led_col[s+1] & 0x00FF0000) >> 16;
+			Led_Controller.Strips[s].G = (led_col[s+1] & 0x0000FF00) >> 8;
+			Led_Controller.Strips[s].B = (led_col[s+1] & 0x000000FF) >> 0;
+		}
+	}
+		
 
 	Animation* infoFadeIn = new LambdaAnimation(
 		[this, r, g, b](float t)
 	{
+		float c_coeff = Math::lerp(0.0f, 1.0f, t);
 		mSystemInfo.setOpacity((unsigned char)(Math::lerp(0.f, 1.f, t) * 255));
 
-		if (Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
-									(unsigned char)(Math::lerp(0.0f, 1.0f, t) * Led_Controller.R),
-			      					(unsigned char)(Math::lerp(0.0f, 1.0f, t) * Led_Controller.G),
-			      					(unsigned char)(Math::lerp(0.0f, 1.0f, t) * Led_Controller.B),
-									(unsigned char)(Math::lerp(0.0f, 1.0f, t) * Led_Controller.W)									);
+		/*if (Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
+									(unsigned char)(c_coeff * Led_Controller.R),
+			      					(unsigned char)(c_coeff * Led_Controller.G),
+			      					(unsigned char)(c_coeff * Led_Controller.B),
+									(unsigned char)(c_coeff * Led_Controller.W));*/
+		if ( Led_Controller.Active )						
+		{
+			for ( int s = 0; s < 4 ; s++ )
+			{
+				if ( Led_Controller.Strips[s].IsMarquee ) continue;
+			
+				WriteColor(s, (unsigned char)(c_coeff * Led_Controller.Strips[s].R),
+			      			  (unsigned char)(c_coeff * Led_Controller.Strips[s].G),
+			      			  (unsigned char)(c_coeff * Led_Controller.Strips[s].B),
+							  (unsigned char)(c_coeff * Led_Controller.Strips[s].W));
+			}
+		}
+		
 	}, goFast ? 10 : 300);   //10 : 300
 
 	// wait 600ms to fade in
 	setAnimation(infoFadeIn, goFast ? 0 : 1000, [this]{
-		Led_Controller.R_Old = Led_Controller.R;
-		Led_Controller.G_Old = Led_Controller.G;
-		Led_Controller.B_Old = Led_Controller.B;
-		Led_Controller.W_Old = Led_Controller.W;
+		for ( int s = 0; s < 4 ; s++ )
+		{
+			if ( Led_Controller.Strips[s].IsMarquee ) continue;
+				
+			Led_Controller.Strips[s].R_Old = Led_Controller.Strips[s].R;
+			Led_Controller.Strips[s].G_Old = Led_Controller.Strips[s].G;
+			Led_Controller.Strips[s].B_Old = Led_Controller.Strips[s].B;
+			Led_Controller.Strips[s].W_Old = Led_Controller.Strips[s].W;
+		}
 	}, false, 2);
 
 	// no need to animate transition, we're not going anywhere (probably mEntries.size() == 1)

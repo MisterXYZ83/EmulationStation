@@ -163,32 +163,88 @@ void ViewController::playViewTransition()
 
 		if ( mState.system && mState.system->getTheme() )
 		{
-			int col = mState.system->getTheme()->getLedColor();
-
-			Led_Controller.W = (col & 0xFF000000) >> 24;
-			Led_Controller.R = (col & 0x00FF0000) >> 16;
-			Led_Controller.G = (col & 0x0000FF00) >> 8;
-			Led_Controller.B = (col & 0x000000FF) >> 0;
+			//colore destinazione
+			int led_col[5] = {0};
+		
+			led_col[0] = getSelected()->getTheme()->getLedColor(0);
+			led_col[1] = getSelected()->getTheme()->getLedColor(1);
+			led_col[2] = getSelected()->getTheme()->getLedColor(2);
+			led_col[3] = getSelected()->getTheme()->getLedColor(3);
+			led_col[4] = getSelected()->getTheme()->getLedColor(4);
+		
+			for ( int s = 0; s < 4 ; s++ )
+			{
+				if ( Led_Controller.Strips[s].IsMarquee ) continue;
+				
+				if ( led_col[0] != 0 )
+				{
+					Led_Controller.Strips[s].W = (led_col[0] & 0xFF000000) >> 24;
+					Led_Controller.Strips[s].R = (led_col[0] & 0x00FF0000) >> 16;
+					Led_Controller.Strips[s].G = (led_col[0] & 0x0000FF00) >> 8;
+					Led_Controller.Strips[s].B = (led_col[0] & 0x000000FF) >> 0;
+				}
+				else
+				{
+					Led_Controller.Strips[s].W = (led_col[s+1] & 0xFF000000) >> 24;
+					Led_Controller.Strips[s].R = (led_col[s+1] & 0x00FF0000) >> 16;
+					Led_Controller.Strips[s].G = (led_col[s+1] & 0x0000FF00) >> 8;
+					Led_Controller.Strips[s].B = (led_col[s+1] & 0x000000FF) >> 0;
+				}
+			}
 		}
-
+		
 		auto fadeInFunc = [this](float t) {
+			
+			float c_coeff = Math::lerp(1.0f, 0.0f, t);
 			mFadeOpacity = Math::lerp(0, 1, t);
 
-			if ( Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
+			if (Led_Controller.Active )
+			{
+				for ( int strip = 0 ; strip < 4 ; strip++ )
+				{	
+					if ( !Led_Controller.Strips[s].IsMarquee ) 
+					{
+						Write_Strip(s, 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].R_Old), 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].G_Old), 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].B_Old), 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].W_Old));
+					}
+				}
+			}	
+		
+			/*if ( Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
 										(unsigned char)(Math::lerp(1,0,t) * Led_Controller.R_Old),
 				      	      			(unsigned char)(Math::lerp(1,0,t) * Led_Controller.G_Old),
 				              			(unsigned char)(Math::lerp(1,0,t) * Led_Controller.B_Old),
-										(unsigned char)(Math::lerp(1,0,t) * Led_Controller.W_Old));
+										(unsigned char)(Math::lerp(1,0,t) * Led_Controller.W_Old));*/
 		};
 
 		auto fadeOutFunc = [this](float t) {
+			
+			float c_coeff = Math::lerp(1.0f, 0.0f, t);
 			mFadeOpacity = Math::lerp(0, 1, t);
 
-			if ( Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
+			if (Led_Controller.Active )
+			{
+				for ( int strip = 0 ; strip < 4 ; strip++ )
+				{	
+					if ( !Led_Controller.Strips[s].IsMarquee ) 
+					{
+						Write_Strip(s, 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].R), 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].G), 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].B), 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].W));
+					}
+				}
+			}	
+			
+			/*if ( Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
 											(unsigned char)(Math::lerp(1,0,t) * Led_Controller.R),
 											(unsigned char)(Math::lerp(1,0,t) * Led_Controller.G),
 			                      			(unsigned char)(Math::lerp(1,0,t) * Led_Controller.B),
-											(unsigned char)(Math::lerp(1,0,t) * Led_Controller.W));
+											(unsigned char)(Math::lerp(1,0,t) * Led_Controller.W));*/
 		};
 
 		const static int FADE_DURATION = 240; // fade in/out time

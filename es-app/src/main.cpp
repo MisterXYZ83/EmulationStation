@@ -257,8 +257,10 @@ void onExit()
 
 int main(int argc, char* argv[])
 {
-	int base_ch, led_active, led_mode;
-
+	int led_active;
+	int marquee_strip;
+	int marquee_color;
+	
 	srand((unsigned int)time(NULL));
 
 	std::locale::global(std::locale("C"));
@@ -267,11 +269,24 @@ int main(int argc, char* argv[])
 		return 0;
 
 	led_active = Settings::getInstance()->getInt("LedActive");
-	base_ch = Settings::getInstance()->getInt("LedBaseChannel");
-	led_mode = Settings::getInstance()->getInt("LedOutputMode");
+	marquee_strip = Settings::getInstance()->getInt("LedMarqueeIndex");
+	marquee_color = Settings::getInstance()->getInt("LedMarqueeColor");
 	
 	Init_Led_Driver();
-	Init_Led_Controller(led_active, base_ch, led_mode);
+	Init_Led_Controller(led_active);
+	
+	if ( (marquee_strip >= 1) && (marquee_strip <= 4) )
+	{
+		Led_Controller.Strips[marquee_strip-1].IsMarquee = 1;
+		
+		Led_Controller.Strips[marquee_strip-1].W = (marquee_color & 0xFF000000) >> 24;
+		Led_Controller.Strips[marquee_strip-1].W = (marquee_color & 0x00FF0000) >> 16;
+		Led_Controller.Strips[marquee_strip-1].W = (marquee_color & 0x0000FF00) >>  8;
+		Led_Controller.Strips[marquee_strip-1].W = (marquee_color & 0x000000FF) >>  0;
+	}
+	
+	//accendo il marquee
+	Turn_On_Marquee();
 
 	// only show the console on Windows if HideConsole is false
 #ifdef WIN32
@@ -472,6 +487,9 @@ int main(int argc, char* argv[])
 	CollectionSystemManager::deinit();
 	SystemData::deleteSystems();
 
+	//spengo tutto
+	Turn_Off_All();
+	
 	// call this ONLY when linking with FreeImage as a static library
 #ifdef FREEIMAGE_LIB
 	FreeImage_DeInitialise();

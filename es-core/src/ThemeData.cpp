@@ -258,7 +258,11 @@ void ThemeData::loadFile(std::map<std::string, std::string> sysDataMap, const st
 		throw error << "Theme uses format version " << mVersion << ". Minimum supported version is " << MINIMUM_THEME_FORMAT_VERSION << ".";
 
 	//tema led
-	mLedColor = root.child("led").text().as_uint(0x00000000);
+	mLedColor[0] = root.child("led").text().as_uint(0x00000000);
+	mLedColor[1] = root.child("led1").text().as_uint(0x00000000);
+	mLedColor[2] = root.child("led2").text().as_uint(0x00000000);
+	mLedColor[3] = root.child("led3").text().as_uint(0x00000000);
+	mLedColor[4] = root.child("led4").text().as_uint(0x00000000);
 	
 	// parse resolution
 	std::string resolution = root.child("resolution").text().as_string("");

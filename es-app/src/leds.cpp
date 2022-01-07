@@ -92,7 +92,7 @@ void Write_I2C_Data(uint8 slaveAddress, uint8 registerAddress, const uint8 *data
 	p_I2C_DeviceWrite(ftHandle, slaveAddress, bytesToTransfer, buffer, &bytesTransfered, options);
 }
 
-void Init_Led_Controller(int active, int base_ch, int mode)
+void Init_Led_Controller(int active)
 {
 	ChannelConfig channelConf;
 	uint32 channels = 0;
@@ -111,7 +111,6 @@ void Init_Led_Controller(int active, int base_ch, int mode)
 	if ( FT_OK != p_I2C_OpenChannel(0, &ftHandle) ) return; 
 	if ( FT_OK != p_I2C_InitChannel(ftHandle, &channelConf) ) return;
 	
-	Led_Controller.BaseChannel = base_ch;
 	Led_Controller.Active = active;
 	
 	pca9685_regs[0] = 0x21;
@@ -121,11 +120,16 @@ void Init_Led_Controller(int active, int base_ch, int mode)
 	Write_I2C_Data(0x40, 0x01, &pca9685_regs[1], 1);
 }
 
-void WriteColor(int ch, int r, int g, int b, int w)
+void Write_Strip(int strip, int r, int g, int b, int w)
 {
 	int reg_addr;
 	int base_reg;
-	base_reg = 6 + ch * 16;
+	base_reg = 6 + strip * 16;
+	
+	r *= MAX_PWM / 256;
+	g *= MAX_PWM / 256;
+	b *= MAX_PWM / 256;
+	w *= MAX_PWM / 256;
 	
 	//rosso
 	pca9685_regs[base_reg + 4 * 0 + 0] = 0x00;	
@@ -154,3 +158,69 @@ void WriteColor(int ch, int r, int g, int b, int w)
 	Write_I2C_Data(0x40, base_reg, &pca9685_regs[base_reg], 16);
 }
 
+void Write_Channel (int channel, int v)
+{
+	int reg_addr;
+	int base_reg;
+	base_reg = 6 + channel * 4;
+	
+	v *= MAX_PWM / 256;
+	
+	pca9685_regs[base_reg + 4 * 0 + 0] = 0x00;	
+	pca9685_regs[base_reg + 4 * 0 + 1] = 0x00;
+	pca9685_regs[base_reg + 4 * 0 + 2] = (v & 0x00FF);
+	pca9685_regs[base_reg + 4 * 0 + 3] = (v & 0x0F00) >> 8;
+	
+	Write_I2C_Data(0x40, base_reg, &pca9685_regs[base_reg], 16);
+}
+
+void Turn_Off_All (void)
+{
+	if ( !Led_Controller.Active ) return;
+	
+	int base_reg;
+	base_reg = 6
+	
+	for ( int c = 0 ; c < (16 * 4); c += 4 )
+	{
+		pca9685_regs[base_reg + 4 * 0 + 0] = 0x00;	
+		pca9685_regs[base_reg + 4 * 0 + 1] = 0x00;
+		pca9685_regs[base_reg + 4 * 0 + 2] = 0x00;
+		pca9685_regs[base_reg + 4 * 0 + 3] = 0x00;
+	}
+
+	Write_I2C_Data(0x40, base_reg, &pca9685_regs[base_reg], 16);
+}
+
+void Turn_On_Marquee (void)
+{
+	//accendo il marquee
+	if ( !Led_Controller.Active ) return;
+	
+	for ( int s = 0 ; s < 4 ; s++ )
+	{
+		if ( Led_Controller.Strips[s].IsMarquee )
+		{
+			Write_Strip(s, Led_Controller.Strips[s].R, 
+						   Led_Controller.Strips[s].G, 
+						   Led_Controller.Strips[s].B,
+						   Led_Controller.Strips[s].W);
+			break;
+		}
+	}
+}
+
+void Turn_Off_Marquee (void)
+{
+	//accendo il marquee
+	if ( !Led_Controller.Active ) return;
+	
+	for ( int s = 0 ; s < 4 ; s++ )
+	{
+		if ( Led_Controller.Strips[s].IsMarquee )
+		{
+			Write_Strip(s, 0, 0, 0, 0);
+			break;
+		}
+	}
+}

@@ -8,24 +8,27 @@ extern void Init_Led_Controller(int active, int base_ch, int mode);
 
 typedef struct
 {
-	int BaseChannel;
+	int IsMarquee;
 	
-	int R;
-	int G;
-	int B;
-	int W;
-	
-	int R_Old;
-	int G_Old;
-	int B_Old;
-	int W_Old;
-	
-	int Active;
+	int R; int G; int B; int W;
+	int R_Old; int G_Old; int B_Old; int W_Old;
+}
+T_Led_Strip;
 
-} T_Led_Controller;
+typedef struct
+{
+	int Active;
+		
+	T_Led_Strip Strips[4];
+}
+T_Led_Controller;
 
 extern T_Led_Controller Led_Controller;
 
-extern void WriteColor(int ch, int r, int g, int b, int w);
+extern void Write_Strip (int strip, int r, int g, int b, int w);
+extern void Write_Channel (int channel, int v);
+extern void Turn_On_Marquee (void);
+extern void Turn_Off_Marquee (void);
+extern void Turn_Off_All (void);
 
 #endif
