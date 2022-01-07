@@ -59,13 +59,13 @@ void GuiMenu::openLedSettings()
 		int m_color = Settings::getInstance()->getInt("LedMarqueeColor");
 
 		w = (m_color & 0xFF000000) >> 24; 
-		auto marquee_w = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
+		auto marquee_w = std::make_shared<SliderComponent>(mWindow, 0.f, 255.0f, 1.f, "%");
 		marquee_w->setValue(w);
 		s->addWithLabel("White", marquee_w);
 		s->addSaveFunc([marquee_w] 
 		{ 
 			int c = Settings::getInstance()->getInt("LedMarqueeColor");
-			int v = (int)(marquee_w->getValue() * 255.0f);
+			int v = (int)(marquee_w->getValue());
 			
 			c &= ~(0xFF000000);
 			c |= (v << 24);
@@ -81,13 +81,13 @@ void GuiMenu::openLedSettings()
 		});
 		
 		r = (m_color & 0x00FF0000) >> 16; 
-		auto marquee_r = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
+		auto marquee_r = std::make_shared<SliderComponent>(mWindow, 0.f, 255.0f, 1.f, "%");
 		marquee_r->setValue(r);
 		s->addWithLabel("Red", marquee_r);
 		s->addSaveFunc([marquee_r] 
 		{ 
 			int c = Settings::getInstance()->getInt("LedMarqueeColor");
-			int v = (int)(marquee_r->getValue() * 255.0f);
+			int v = (int)(marquee_r->getValue());
 			
 			c &= ~(0x00FF0000);
 			c |= (v << 16);
@@ -103,13 +103,13 @@ void GuiMenu::openLedSettings()
 		});
 		
 		g = (m_color & 0x0000FF00) >>  8; 
-		auto marquee_g = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
+		auto marquee_g = std::make_shared<SliderComponent>(mWindow, 0.f, 255.0f, 1.f, "%");
 		marquee_g->setValue(g);
 		s->addWithLabel("Green", marquee_g);
 		s->addSaveFunc([marquee_g] 
 		{ 
 			int c = Settings::getInstance()->getInt("LedMarqueeColor");
-			int v = (int)(marquee_g->getValue() * 255.0f);
+			int v = (int)(marquee_g->getValue());
 			
 			c &= ~(0x0000FF00);
 			c |= (v << 8);
@@ -125,13 +125,13 @@ void GuiMenu::openLedSettings()
 		});
 		
 		b = (m_color & 0x000000FF) >>  0; 
-		auto marquee_b = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
+		auto marquee_b = std::make_shared<SliderComponent>(mWindow, 0.f, 255.0f, 1.f, "%");
 		marquee_b->setValue(b);
 		s->addWithLabel("Blue", marquee_b);
 		s->addSaveFunc([marquee_b] 
 		{ 
 			int c = Settings::getInstance()->getInt("LedMarqueeColor");
-			int v = (int)(marquee_b->getValue() * 255.0f);
+			int v = (int)(marquee_b->getValue());
 			
 			c &= ~(0x000000FF);
 			c |= (v << 0);
