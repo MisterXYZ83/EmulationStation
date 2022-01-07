@@ -174,21 +174,22 @@ void ViewController::playViewTransition()
 		
 			for ( int s = 0; s < 4 ; s++ )
 			{
-				if ( Led_Controller.Strips[s].IsMarquee ) continue;
-				
-				if ( led_col[0] != 0 )
+				if ( !Led_Controller.Strips[s].IsMarquee )
 				{
-					Led_Controller.Strips[s].W = (led_col[0] & 0xFF000000) >> 24;
-					Led_Controller.Strips[s].R = (led_col[0] & 0x00FF0000) >> 16;
-					Led_Controller.Strips[s].G = (led_col[0] & 0x0000FF00) >> 8;
-					Led_Controller.Strips[s].B = (led_col[0] & 0x000000FF) >> 0;
-				}
-				else
-				{
-					Led_Controller.Strips[s].W = (led_col[s+1] & 0xFF000000) >> 24;
-					Led_Controller.Strips[s].R = (led_col[s+1] & 0x00FF0000) >> 16;
-					Led_Controller.Strips[s].G = (led_col[s+1] & 0x0000FF00) >> 8;
-					Led_Controller.Strips[s].B = (led_col[s+1] & 0x000000FF) >> 0;
+					if ( led_col[0] != 0 )
+					{
+						Led_Controller.Strips[s].W = (led_col[0] & 0xFF000000) >> 24;
+						Led_Controller.Strips[s].R = (led_col[0] & 0x00FF0000) >> 16;
+						Led_Controller.Strips[s].G = (led_col[0] & 0x0000FF00) >> 8;
+						Led_Controller.Strips[s].B = (led_col[0] & 0x000000FF) >> 0;
+					}
+					else
+					{
+						Led_Controller.Strips[s].W = (led_col[s+1] & 0xFF000000) >> 24;
+						Led_Controller.Strips[s].R = (led_col[s+1] & 0x00FF0000) >> 16;
+						Led_Controller.Strips[s].G = (led_col[s+1] & 0x0000FF00) >> 8;
+						Led_Controller.Strips[s].B = (led_col[s+1] & 0x000000FF) >> 0;
+					}
 				}
 			}
 		}
@@ -204,13 +205,21 @@ void ViewController::playViewTransition()
 				{	
 					if ( !Led_Controller.Strips[s].IsMarquee ) 
 					{
-						Write_Strip(s, 
+						Push_Strip(s, 
 							(unsigned char)(c_coeff * Led_Controller.Strips[s].R_Old), 
 							(unsigned char)(c_coeff * Led_Controller.Strips[s].G_Old), 
 							(unsigned char)(c_coeff * Led_Controller.Strips[s].B_Old), 
 							(unsigned char)(c_coeff * Led_Controller.Strips[s].W_Old));
+							
+						/*Write_Strip(s, 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].R_Old), 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].G_Old), 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].B_Old), 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].W_Old));*/
 					}
 				}
+				
+				Update_Leds();
 			}	
 		
 			/*if ( Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
@@ -231,13 +240,21 @@ void ViewController::playViewTransition()
 				{	
 					if ( !Led_Controller.Strips[s].IsMarquee ) 
 					{
-						Write_Strip(s, 
+						Push_Strip(s, 
 							(unsigned char)(c_coeff * Led_Controller.Strips[s].R), 
 							(unsigned char)(c_coeff * Led_Controller.Strips[s].G), 
 							(unsigned char)(c_coeff * Led_Controller.Strips[s].B), 
 							(unsigned char)(c_coeff * Led_Controller.Strips[s].W));
+							
+						/*Write_Strip(s, 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].R), 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].G), 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].B), 
+							(unsigned char)(c_coeff * Led_Controller.Strips[s].W));*/
 					}
 				}
+				
+				Update_Leds();
 			}	
 			
 			/*if ( Led_Controller.Active ) WriteColor(Led_Controller.BaseChannel, 
@@ -256,12 +273,13 @@ void ViewController::playViewTransition()
 				
 				for ( int s = 0 ; s < 4 ; s++ )
 				{
-					if ( Led_Controller.Strips[s].IsMarquee ) continue;
-					
-					Led_Controller.Strips[s].R_Old = Led_Controller.Strips[s].R;
-					Led_Controller.Strips[s].G_Old = Led_Controller.Strips[s].G;
-					Led_Controller.Strips[s].B_Old = Led_Controller.Strips[s].B;
-					Led_Controller.Strips[s].W_Old = Led_Controller.Strips[s].W;
+					if ( !Led_Controller.Strips[s].IsMarquee )
+					{
+						Led_Controller.Strips[s].R_Old = Led_Controller.Strips[s].R;
+						Led_Controller.Strips[s].G_Old = Led_Controller.Strips[s].G;
+						Led_Controller.Strips[s].B_Old = Led_Controller.Strips[s].B;
+						Led_Controller.Strips[s].W_Old = Led_Controller.Strips[s].W;
+					}
 				}
 				
 			}, true);

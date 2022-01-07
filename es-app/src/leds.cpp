@@ -120,7 +120,7 @@ void Init_Led_Controller(int active)
 	Write_I2C_Data(0x40, 0x01, &pca9685_regs[1], 1);
 }
 
-void Write_Strip(int strip, int r, int g, int b, int w)
+void Push_Strip (int strip, int r, int g, int b, int w)
 {
 	int reg_addr;
 	int base_reg;
@@ -154,7 +154,18 @@ void Write_Strip(int strip, int r, int g, int b, int w)
 	pca9685_regs[base_reg + 4 * 3 + 1] = 0x00;
 	pca9685_regs[base_reg + 4 * 3 + 2] = (w & 0x00FF);
 	pca9685_regs[base_reg + 4 * 3 + 3] = (w & 0x0F00) >> 8;
+}
 
+void Update_Leds(void)
+{
+	//scrivo tutti i registri
+	Write_I2C_Data(0x40, 6, &pca9685_regs[6], 64);
+}
+
+void Write_Strip(int strip, int r, int g, int b, int w)
+{
+	Push_Strip(strip, r, g, b, w);
+	
 	Write_I2C_Data(0x40, base_reg, &pca9685_regs[base_reg], 16);
 }
 
@@ -189,7 +200,7 @@ void Turn_Off_All (void)
 		pca9685_regs[base_reg + 4 * 0 + 3] = 0x00;
 	}
 
-	Write_I2C_Data(0x40, base_reg, &pca9685_regs[base_reg], 16);
+	Write_I2C_Data(0x40, base_reg, &pca9685_regs[base_reg], 64);
 }
 
 void Turn_On_Marquee (void)

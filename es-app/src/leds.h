@@ -25,6 +25,10 @@ T_Led_Controller;
 
 extern T_Led_Controller Led_Controller;
 
+//funzioni di aggiornamento posticipato
+extern void Push_Strip (int strip, int r, int g, int b, int w);
+extern void Update_Leds(void);
+//funzioni di aggiornamento e scrittura immediata
 extern void Write_Strip (int strip, int r, int g, int b, int w);
 extern void Write_Channel (int channel, int v);
 extern void Turn_On_Marquee (void);
