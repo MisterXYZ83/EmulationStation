@@ -258,10 +258,10 @@ void ViewController::playViewTransition()
 				{
 					if ( Led_Controller.Strips[s].IsMarquee ) continue;
 					
-					Led_Controller.Strip[s].R_Old = Led_Controller.Strip[s].R;
-					Led_Controller.Strip[s].G_Old = Led_Controller.Strip[s].G;
-					Led_Controller.Strip[s].B_Old = Led_Controller.Strip[s].B;
-					Led_Controller.Strip[s].W_Old = Led_Controller.Strip[s].W;
+					Led_Controller.Strips[s].R_Old = Led_Controller.Strips[s].R;
+					Led_Controller.Strips[s].G_Old = Led_Controller.Strips[s].G;
+					Led_Controller.Strips[s].B_Old = Led_Controller.Strips[s].B;
+					Led_Controller.Strips[s].W_Old = Led_Controller.Strips[s].W;
 				}
 				
 			}, true);
