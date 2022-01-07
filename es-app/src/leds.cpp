@@ -164,6 +164,10 @@ void Update_Leds(void)
 
 void Write_Strip(int strip, int r, int g, int b, int w)
 {
+	int reg_addr;
+	int base_reg;
+	base_reg = 6 + strip * 16;
+	
 	Push_Strip(strip, r, g, b, w);
 	
 	Write_I2C_Data(0x40, base_reg, &pca9685_regs[base_reg], 16);
