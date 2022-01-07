@@ -18,7 +18,8 @@ T_Led_Strip;
 typedef struct
 {
 	int Active;
-		
+	int Marquee_Index;
+	
 	T_Led_Strip Strips[4];
 }
 T_Led_Controller;

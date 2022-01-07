@@ -277,6 +277,8 @@ int main(int argc, char* argv[])
 	
 	if ( (marquee_strip >= 1) && (marquee_strip <= 4) )
 	{
+		Led_Controller.Marquee_Index = marquee_strip;
+		
 		Led_Controller.Strips[marquee_strip-1].IsMarquee = 1;
 		
 		Led_Controller.Strips[marquee_strip-1].W = (marquee_color & 0xFF000000) >> 24;

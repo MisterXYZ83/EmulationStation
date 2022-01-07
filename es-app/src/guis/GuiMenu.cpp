@@ -23,27 +23,161 @@
 #include "views/gamelist/IGameListView.h"
 #include "guis/GuiInfoPopup.h"
 
+#include "leds.h"
+
 GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MENU"), mVersion(window)
 {
 	bool isFullUI = UIModeController::getInstance()->isUIModeFull();
-
+	bool isAdvanced = Settings::getInstance()->getBool("AdvancedMenu");
+	
 	if (isFullUI) {
-		addEntry("SCRAPER", 0x777777FF, true, [this] { openScraperSettings(); });
-		addEntry("SOUND SETTINGS", 0x777777FF, true, [this] { openSoundSettings(); });
+		if ( isAdvanced ) addEntry("SCRAPER", 0x777777FF, true, [this] { openScraperSettings(); });
+		if ( isAdvanced ) addEntry("SOUND SETTINGS", 0x777777FF, true, [this] { openSoundSettings(); });
 		addEntry("UI SETTINGS", 0x777777FF, true, [this] { openUISettings(); });
-		addEntry("GAME COLLECTION SETTINGS", 0x777777FF, true, [this] { openCollectionSystemSettings(); });
-		addEntry("OTHER SETTINGS", 0x777777FF, true, [this] { openOtherSettings(); });
-		addEntry("CONFIGURE INPUT", 0x777777FF, true, [this] { openConfigInput(); });
-	} else {
+		if ( isAdvanced ) addEntry("GAME COLLECTION SETTINGS", 0x777777FF, true, [this] { openCollectionSystemSettings(); });
+		if ( isAdvanced ) addEntry("OTHER SETTINGS", 0x777777FF, true, [this] { openOtherSettings(); });
+		if ( isAdvanced ) addEntry("CONFIGURE INPUT", 0x777777FF, true, [this] { openConfigInput(); });
+	} else if ( isAdvanced )  {
 		addEntry("SOUND SETTINGS", 0x777777FF, true, [this] { openSoundSettings(); });
 	}
-
+	
+	addEntry("LEDs"), 0x777777FF, true, [this] {openLedSettings(); });
 	addEntry("QUIT", 0x777777FF, true, [this] {openQuitMenu(); });
 
 	addChild(&mMenu);
 	addVersionInfo();
 	setSize(mMenu.getSize());
 	setPosition((Renderer::getScreenWidth() - mSize.x()) / 2, Renderer::getScreenHeight() * 0.15f);
+}
+
+void GuiMenu::openLedSettings()
+{
+	if ( Led_Controller.Active && (Led_Controller.Marquee_Index > 0) )
+	{
+		auto s = new GuiSettings(mWindow, "LEDs");
+		int w,r,g,b;
+		int m_color = Settings::getInstance()->getInt("LedMarqueeColor");
+
+		w = (m_color & 0xFF000000) >> 24; 
+		auto marquee_w = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
+		marquee_w->setValue(w);
+		s->addWithLabel("White", marquee_w);
+		s->addSaveFunc([marquee_w] 
+		{ 
+			int c = Settings::getInstance()->getInt("LedMarqueeColor");
+			int v = (int)(marquee_w->value * 255.0f);
+			
+			c &= ~(0xFF000000);
+			c |= (v << 24);
+			
+			Setting::getInstance()->setInt("LedMarqueeColor", v); 
+			
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].W = (c & 0xFF000000) >> 24;
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].R = (c & 0x00FF0000) >> 16;
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].G = (c & 0x0000FF00) >>  8;
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].B = (c & 0x000000FF) >>  0;
+			
+			Turn_On_Marquee();
+		});
+		
+		r = (m_color & 0x00FF0000) >> 16; 
+		auto marquee_r = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
+		marquee_r->setValue(r);
+		s->addWithLabel("Red", marquee_r);
+		s->addSaveFunc([marquee_r] 
+		{ 
+			int c = Settings::getInstance()->getInt("LedMarqueeColor");
+			int v = (int)(marquee_r->value * 255.0f);
+			
+			c &= ~(0x00FF0000);
+			c |= (v << 16);
+			
+			Setting::getInstance()->setInt("LedMarqueeColor", v); 
+			
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].W = (c & 0xFF000000) >> 24;
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].R = (c & 0x00FF0000) >> 16;
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].G = (c & 0x0000FF00) >>  8;
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].B = (c & 0x000000FF) >>  0;
+			
+			Turn_On_Marquee();
+		});
+		
+		g = (m_color & 0x0000FF00) >>  8; 
+		auto marquee_g = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
+		marquee_g->setValue(g);
+		s->addWithLabel("Green", marquee_g);
+		s->addSaveFunc([marquee_g] 
+		{ 
+			int c = Settings::getInstance()->getInt("LedMarqueeColor");
+			int v = (int)(marquee_g->value * 255.0f);
+			
+			c &= ~(0x0000FF00);
+			c |= (v << 8);
+			
+			Setting::getInstance()->setInt("LedMarqueeColor", v); 
+			
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].W = (c & 0xFF000000) >> 24;
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].R = (c & 0x00FF0000) >> 16;
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].G = (c & 0x0000FF00) >>  8;
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].B = (c & 0x000000FF) >>  0;
+			
+			Turn_On_Marquee();
+		});
+		
+		b = (m_color & 0x000000FF) >>  0; 
+		auto marquee_b = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
+		marquee_b->setValue(b);
+		s->addWithLabel("Blue", marquee_b);
+		s->addSaveFunc([marquee_b] 
+		{ 
+			int c = Settings::getInstance()->getInt("LedMarqueeColor");
+			int v = (int)(marquee_b->value * 255.0f);
+			
+			c &= ~(0x000000FF);
+			c |= (v << 0);
+			
+			Setting::getInstance()->setInt("LedMarqueeColor", v); 
+			
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].W = (c & 0xFF000000) >> 24;
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].R = (c & 0x00FF0000) >> 16;
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].G = (c & 0x0000FF00) >>  8;
+			Led_Controller.Strips[Led_Controller.Marquee_Index-1].B = (c & 0x000000FF) >>  0;
+			
+			Turn_On_Marquee();
+		});		
+	}
+	
+	// scrape from
+	auto scraper_list = std::make_shared< OptionListComponent< std::string > >(mWindow, "SCRAPE FROM", false);
+	std::vector<std::string> scrapers = getScraperList();
+
+	// Select either the first entry of the one read from the settings, just in case the scraper from settings has vanished.
+	for(auto it = scrapers.cbegin(); it != scrapers.cend(); it++)
+		scraper_list->add(*it, *it, *it == Settings::getInstance()->getString("Scraper"));
+
+	s->addWithLabel("SCRAPE FROM", scraper_list);
+	s->addSaveFunc([scraper_list] { Settings::getInstance()->setString("Scraper", scraper_list->getSelected()); });
+
+	// scrape ratings
+	auto scrape_ratings = std::make_shared<SwitchComponent>(mWindow);
+	scrape_ratings->setState(Settings::getInstance()->getBool("ScrapeRatings"));
+	s->addWithLabel("SCRAPE RATINGS", scrape_ratings);
+	s->addSaveFunc([scrape_ratings] { Settings::getInstance()->setBool("ScrapeRatings", scrape_ratings->getState()); });
+
+	// scrape now
+	ComponentListRow row;
+	auto openScrapeNow = [this] { mWindow->pushGui(new GuiScraperStart(mWindow)); };
+	std::function<void()> openAndSave = openScrapeNow;
+	openAndSave = [s, openAndSave] { s->save(); openAndSave(); };
+	row.makeAcceptInputHandler(openAndSave);
+
+	auto scrape_now = std::make_shared<TextComponent>(mWindow, "SCRAPE NOW", Font::get(FONT_SIZE_MEDIUM), 0x777777FF);
+	auto bracket = makeArrow(mWindow);
+	row.addElement(scrape_now, true);
+	row.addElement(bracket, false);
+	s->addRow(row);
+
+	mWindow->pushGui(s);
 }
 
 void GuiMenu::openScraperSettings()
@@ -197,33 +331,8 @@ void GuiMenu::openSoundSettings()
 void GuiMenu::openUISettings()
 {
 	auto s = new GuiSettings(mWindow, "UI SETTINGS");
-
-	//UI mode
-	auto UImodeSelection = std::make_shared< OptionListComponent<std::string> >(mWindow, "UI MODE", false);
-	std::vector<std::string> UImodes = UIModeController::getInstance()->getUIModes();
-	for (auto it = UImodes.cbegin(); it != UImodes.cend(); it++)
-		UImodeSelection->add(*it, *it, Settings::getInstance()->getString("UIMode") == *it);
-	s->addWithLabel("UI MODE", UImodeSelection);
-	Window* window = mWindow;
-	s->addSaveFunc([ UImodeSelection, window]
-	{
-		std::string selectedMode = UImodeSelection->getSelected();
-		if (selectedMode != "Full")
-		{
-			std::string msg = "You are changing the UI to a restricted mode:\n" + selectedMode + "\n";
-			msg += "This will hide most menu-options to prevent changes to the system.\n";
-			msg += "To unlock and return to the full UI, enter this code: \n";
-			msg += "\"" + UIModeController::getInstance()->getFormattedPassKeyStr() + "\"\n\n";
-			msg += "Do you want to proceed?";
-			window->pushGui(new GuiMsgBox(window, msg,
-				"YES", [selectedMode] {
-					LOG(LogDebug) << "Setting UI mode to " << selectedMode;
-					Settings::getInstance()->setString("UIMode", selectedMode);
-					Settings::getInstance()->saveFile();
-			}, "NO",nullptr));
-		}
-	});
-
+	bool isAdvanced = Settings::getInstance()->getBool("AdvancedMenu");
+	
 	// screensaver
 	ComponentListRow screensaver_row;
 	screensaver_row.elements.clear();
@@ -237,168 +346,198 @@ void GuiMenu::openUISettings()
 	quick_sys_select->setState(Settings::getInstance()->getBool("QuickSystemSelect"));
 	s->addWithLabel("QUICK SYSTEM SELECT", quick_sys_select);
 	s->addSaveFunc([quick_sys_select] { Settings::getInstance()->setBool("QuickSystemSelect", quick_sys_select->getState()); });
-
-	// carousel transition option
-	auto move_carousel = std::make_shared<SwitchComponent>(mWindow);
-	move_carousel->setState(Settings::getInstance()->getBool("MoveCarousel"));
-	s->addWithLabel("CAROUSEL TRANSITIONS", move_carousel);
-	s->addSaveFunc([move_carousel] {
-		if (move_carousel->getState()
-			&& !Settings::getInstance()->getBool("MoveCarousel")
-			&& PowerSaver::getMode() == PowerSaver::INSTANT)
-		{
-			Settings::getInstance()->setString("PowerSaverMode", "default");
-			PowerSaver::init();
-		}
-		Settings::getInstance()->setBool("MoveCarousel", move_carousel->getState());
-	});
-
-	// transition style
-	auto transition_style = std::make_shared< OptionListComponent<std::string> >(mWindow, "TRANSITION STYLE", false);
-	std::vector<std::string> transitions;
-	transitions.push_back("fade");
-	transitions.push_back("slide");
-	transitions.push_back("instant");
-	for(auto it = transitions.cbegin(); it != transitions.cend(); it++)
-		transition_style->add(*it, *it, Settings::getInstance()->getString("TransitionStyle") == *it);
-	s->addWithLabel("TRANSITION STYLE", transition_style);
-	s->addSaveFunc([transition_style] {
-		if (Settings::getInstance()->getString("TransitionStyle") == "instant"
-			&& transition_style->getSelected() != "instant"
-			&& PowerSaver::getMode() == PowerSaver::INSTANT)
-		{
-			Settings::getInstance()->setString("PowerSaverMode", "default");
-			PowerSaver::init();
-		}
-		Settings::getInstance()->setString("TransitionStyle", transition_style->getSelected());
-	});
-
-	// theme set
-	auto themeSets = ThemeData::getThemeSets();
-
-	if(!themeSets.empty())
+	
+	
+	if ( isAdvanced )
 	{
-		std::map<std::string, ThemeSet>::const_iterator selectedSet = themeSets.find(Settings::getInstance()->getString("ThemeSet"));
-		if(selectedSet == themeSets.cend())
-			selectedSet = themeSets.cbegin();
-
-		auto theme_set = std::make_shared< OptionListComponent<std::string> >(mWindow, "THEME SET", false);
-		for(auto it = themeSets.cbegin(); it != themeSets.cend(); it++)
-			theme_set->add(it->first, it->first, it == selectedSet);
-		s->addWithLabel("THEME SET", theme_set);
-
+		//UI mode
+		auto UImodeSelection = std::make_shared< OptionListComponent<std::string> >(mWindow, "UI MODE", false);
+		std::vector<std::string> UImodes = UIModeController::getInstance()->getUIModes();
+		for (auto it = UImodes.cbegin(); it != UImodes.cend(); it++)
+			UImodeSelection->add(*it, *it, Settings::getInstance()->getString("UIMode") == *it);
+		s->addWithLabel("UI MODE", UImodeSelection);
 		Window* window = mWindow;
-		s->addSaveFunc([window, theme_set]
+		s->addSaveFunc([ UImodeSelection, window]
 		{
-			bool needReload = false;
-			std::string oldTheme = Settings::getInstance()->getString("ThemeSet");
-			if(oldTheme != theme_set->getSelected())
-				needReload = true;
-
-			Settings::getInstance()->setString("ThemeSet", theme_set->getSelected());
-
-			if(needReload)
+			std::string selectedMode = UImodeSelection->getSelected();
+			if (selectedMode != "Full")
 			{
-				Scripting::fireEvent("theme-changed", theme_set->getSelected(), oldTheme);
-				CollectionSystemManager::get()->updateSystemsList();
-				ViewController::get()->goToStart();
-				ViewController::get()->reloadAll(); // TODO - replace this with some sort of signal-based implementation
+				std::string msg = "You are changing the UI to a restricted mode:\n" + selectedMode + "\n";
+				msg += "This will hide most menu-options to prevent changes to the system.\n";
+				msg += "To unlock and return to the full UI, enter this code: \n";
+				msg += "\"" + UIModeController::getInstance()->getFormattedPassKeyStr() + "\"\n\n";
+				msg += "Do you want to proceed?";
+				window->pushGui(new GuiMsgBox(window, msg,
+					"YES", [selectedMode] {
+						LOG(LogDebug) << "Setting UI mode to " << selectedMode;
+						Settings::getInstance()->setString("UIMode", selectedMode);
+						Settings::getInstance()->saveFile();
+				}, "NO",nullptr));
 			}
 		});
-	}
 
-	// GameList view style
-	auto gamelist_style = std::make_shared< OptionListComponent<std::string> >(mWindow, "GAMELIST VIEW STYLE", false);
-	std::vector<std::string> styles;
-	styles.push_back("automatic");
-	styles.push_back("basic");
-	styles.push_back("detailed");
-	styles.push_back("video");
-	styles.push_back("grid");
-
-	for (auto it = styles.cbegin(); it != styles.cend(); it++)
-		gamelist_style->add(*it, *it, Settings::getInstance()->getString("GamelistViewStyle") == *it);
-	s->addWithLabel("GAMELIST VIEW STYLE", gamelist_style);
-	s->addSaveFunc([gamelist_style] {
-		bool needReload = false;
-		if (Settings::getInstance()->getString("GamelistViewStyle") != gamelist_style->getSelected())
-			needReload = true;
-		Settings::getInstance()->setString("GamelistViewStyle", gamelist_style->getSelected());
-		if (needReload)
-			ViewController::get()->reloadAll();
-	});
-
-	// Optionally ignore leading articles when sorting game titles
-	auto ignore_articles = std::make_shared<SwitchComponent>(mWindow);
-	ignore_articles->setState(Settings::getInstance()->getBool("IgnoreLeadingArticles"));
-	s->addWithLabel("IGNORE ARTICLES (NAME SORT ONLY)", ignore_articles);
-	s->addSaveFunc([ignore_articles, window] {
-		bool articles_are_ignored = Settings::getInstance()->getBool("IgnoreLeadingArticles");
-		Settings::getInstance()->setBool("IgnoreLeadingArticles", ignore_articles->getState());
-		if (ignore_articles->getState() != articles_are_ignored)
-		{
-			//For each system...
-			for (auto it = SystemData::sSystemVector.cbegin(); it != SystemData::sSystemVector.cend(); it++)
+		// carousel transition option
+		auto move_carousel = std::make_shared<SwitchComponent>(mWindow);
+		move_carousel->setState(Settings::getInstance()->getBool("MoveCarousel"));
+		s->addWithLabel("CAROUSEL TRANSITIONS", move_carousel);
+		s->addSaveFunc([move_carousel] {
+			if (move_carousel->getState()
+				&& !Settings::getInstance()->getBool("MoveCarousel")
+				&& PowerSaver::getMode() == PowerSaver::INSTANT)
 			{
-				//Apply sort recursively
-				FileData* root = (*it)->getRootFolder();
-				root->sort(getSortTypeFromString(root->getSortName()));
-
-				//Notify that the root folder was sorted
-				ViewController::get()->getGameListView((*it))->onFileChanged(root, FILE_SORTED);
+				Settings::getInstance()->setString("PowerSaverMode", "default");
+				PowerSaver::init();
 			}
+			Settings::getInstance()->setBool("MoveCarousel", move_carousel->getState());
+		});
 
-			//Display popup to inform user
-			GuiInfoPopup* popup = new GuiInfoPopup(window, "Files sorted", 4000);
-			window->setInfoPopup(popup);
-		}
-	});
+		// transition style
+		auto transition_style = std::make_shared< OptionListComponent<std::string> >(mWindow, "TRANSITION STYLE", false);
+		std::vector<std::string> transitions;
+		transitions.push_back("fade");
+		transitions.push_back("slide");
+		transitions.push_back("instant");
+		for(auto it = transitions.cbegin(); it != transitions.cend(); it++)
+			transition_style->add(*it, *it, Settings::getInstance()->getString("TransitionStyle") == *it);
+		s->addWithLabel("TRANSITION STYLE", transition_style);
+		s->addSaveFunc([transition_style] {
+			if (Settings::getInstance()->getString("TransitionStyle") == "instant"
+				&& transition_style->getSelected() != "instant"
+				&& PowerSaver::getMode() == PowerSaver::INSTANT)
+			{
+				Settings::getInstance()->setString("PowerSaverMode", "default");
+				PowerSaver::init();
+			}
+			Settings::getInstance()->setString("TransitionStyle", transition_style->getSelected());
+		});
 
-	// lb/rb uses full screen size paging instead of -10/+10 steps
-	auto use_fullscreen_paging = std::make_shared<SwitchComponent>(mWindow);
-	use_fullscreen_paging->setState(Settings::getInstance()->getBool("UseFullscreenPaging"));
-	s->addWithLabel("USE FULL SCREEN PAGING FOR LB/RB", use_fullscreen_paging);
-	s->addSaveFunc([use_fullscreen_paging] {
-		Settings::getInstance()->setBool("UseFullscreenPaging", use_fullscreen_paging->getState());
-	});
+		// theme set
+		auto themeSets = ThemeData::getThemeSets();
 
-	// Optionally start in selected system
-	auto systemfocus_list = std::make_shared< OptionListComponent<std::string> >(mWindow, "START ON SYSTEM", false);
-	systemfocus_list->add("NONE", "", Settings::getInstance()->getString("StartupSystem") == "");
-	for (auto it = SystemData::sSystemVector.cbegin(); it != SystemData::sSystemVector.cend(); it++)
-	{
-		if ("retropie" != (*it)->getName())
+		if(!themeSets.empty())
 		{
-			systemfocus_list->add((*it)->getName(), (*it)->getName(), Settings::getInstance()->getString("StartupSystem") == (*it)->getName());
+			std::map<std::string, ThemeSet>::const_iterator selectedSet = themeSets.find(Settings::getInstance()->getString("ThemeSet"));
+			if(selectedSet == themeSets.cend())
+				selectedSet = themeSets.cbegin();
+
+			auto theme_set = std::make_shared< OptionListComponent<std::string> >(mWindow, "THEME SET", false);
+			for(auto it = themeSets.cbegin(); it != themeSets.cend(); it++)
+				theme_set->add(it->first, it->first, it == selectedSet);
+			s->addWithLabel("THEME SET", theme_set);
+
+			Window* window = mWindow;
+			s->addSaveFunc([window, theme_set]
+			{
+				bool needReload = false;
+				std::string oldTheme = Settings::getInstance()->getString("ThemeSet");
+				if(oldTheme != theme_set->getSelected())
+					needReload = true;
+
+				Settings::getInstance()->setString("ThemeSet", theme_set->getSelected());
+
+				if(needReload)
+				{
+					Scripting::fireEvent("theme-changed", theme_set->getSelected(), oldTheme);
+					CollectionSystemManager::get()->updateSystemsList();
+					ViewController::get()->goToStart();
+					ViewController::get()->reloadAll(); // TODO - replace this with some sort of signal-based implementation
+				}
+			});
 		}
+	
+		// GameList view style
+		auto gamelist_style = std::make_shared< OptionListComponent<std::string> >(mWindow, "GAMELIST VIEW STYLE", false);
+		std::vector<std::string> styles;
+		styles.push_back("automatic");
+		styles.push_back("basic");
+		styles.push_back("detailed");
+		styles.push_back("video");
+		styles.push_back("grid");
+
+		for (auto it = styles.cbegin(); it != styles.cend(); it++)
+			gamelist_style->add(*it, *it, Settings::getInstance()->getString("GamelistViewStyle") == *it);
+		s->addWithLabel("GAMELIST VIEW STYLE", gamelist_style);
+		s->addSaveFunc([gamelist_style] {
+			bool needReload = false;
+			if (Settings::getInstance()->getString("GamelistViewStyle") != gamelist_style->getSelected())
+				needReload = true;
+			Settings::getInstance()->setString("GamelistViewStyle", gamelist_style->getSelected());
+			if (needReload)
+				ViewController::get()->reloadAll();
+		});
+
+		// Optionally ignore leading articles when sorting game titles
+		auto ignore_articles = std::make_shared<SwitchComponent>(mWindow);
+		ignore_articles->setState(Settings::getInstance()->getBool("IgnoreLeadingArticles"));
+		s->addWithLabel("IGNORE ARTICLES (NAME SORT ONLY)", ignore_articles);
+		s->addSaveFunc([ignore_articles, window] {
+			bool articles_are_ignored = Settings::getInstance()->getBool("IgnoreLeadingArticles");
+			Settings::getInstance()->setBool("IgnoreLeadingArticles", ignore_articles->getState());
+			if (ignore_articles->getState() != articles_are_ignored)
+			{
+				//For each system...
+				for (auto it = SystemData::sSystemVector.cbegin(); it != SystemData::sSystemVector.cend(); it++)
+				{
+					//Apply sort recursively
+					FileData* root = (*it)->getRootFolder();
+					root->sort(getSortTypeFromString(root->getSortName()));
+
+					//Notify that the root folder was sorted
+					ViewController::get()->getGameListView((*it))->onFileChanged(root, FILE_SORTED);
+				}
+
+				//Display popup to inform user
+				GuiInfoPopup* popup = new GuiInfoPopup(window, "Files sorted", 4000);
+				window->setInfoPopup(popup);
+			}
+		});
+
+		// lb/rb uses full screen size paging instead of -10/+10 steps
+		auto use_fullscreen_paging = std::make_shared<SwitchComponent>(mWindow);
+		use_fullscreen_paging->setState(Settings::getInstance()->getBool("UseFullscreenPaging"));
+		s->addWithLabel("USE FULL SCREEN PAGING FOR LB/RB", use_fullscreen_paging);
+		s->addSaveFunc([use_fullscreen_paging] {
+			Settings::getInstance()->setBool("UseFullscreenPaging", use_fullscreen_paging->getState());
+		});
+
+		// Optionally start in selected system
+		auto systemfocus_list = std::make_shared< OptionListComponent<std::string> >(mWindow, "START ON SYSTEM", false);
+		systemfocus_list->add("NONE", "", Settings::getInstance()->getString("StartupSystem") == "");
+		for (auto it = SystemData::sSystemVector.cbegin(); it != SystemData::sSystemVector.cend(); it++)
+		{
+			if ("retropie" != (*it)->getName())
+			{
+				systemfocus_list->add((*it)->getName(), (*it)->getName(), Settings::getInstance()->getString("StartupSystem") == (*it)->getName());
+			}
+		}
+		s->addWithLabel("START ON SYSTEM", systemfocus_list);
+		s->addSaveFunc([systemfocus_list] {
+			Settings::getInstance()->setString("StartupSystem", systemfocus_list->getSelected());
+		});
+
+		// show help
+		auto show_help = std::make_shared<SwitchComponent>(mWindow);
+		show_help->setState(Settings::getInstance()->getBool("ShowHelpPrompts"));
+		s->addWithLabel("ON-SCREEN HELP", show_help);
+		s->addSaveFunc([show_help] { Settings::getInstance()->setBool("ShowHelpPrompts", show_help->getState()); });
+
+		// enable filters (ForceDisableFilters)
+		auto enable_filter = std::make_shared<SwitchComponent>(mWindow);
+		enable_filter->setState(!Settings::getInstance()->getBool("ForceDisableFilters"));
+		s->addWithLabel("ENABLE FILTERS", enable_filter);
+		s->addSaveFunc([enable_filter] {
+			bool filter_is_enabled = !Settings::getInstance()->getBool("ForceDisableFilters");
+			Settings::getInstance()->setBool("ForceDisableFilters", !enable_filter->getState());
+			if (enable_filter->getState() != filter_is_enabled) ViewController::get()->ReloadAndGoToStart();
+		});
+
+		// hide start menu in Kid Mode
+		auto disable_start = std::make_shared<SwitchComponent>(mWindow);
+		disable_start->setState(Settings::getInstance()->getBool("DisableKidStartMenu"));
+		s->addWithLabel("DISABLE START MENU IN KID MODE", disable_start);
+		s->addSaveFunc([disable_start] { Settings::getInstance()->setBool("DisableKidStartMenu", disable_start->getState()); });
 	}
-	s->addWithLabel("START ON SYSTEM", systemfocus_list);
-	s->addSaveFunc([systemfocus_list] {
-		Settings::getInstance()->setString("StartupSystem", systemfocus_list->getSelected());
-	});
-
-	// show help
-	auto show_help = std::make_shared<SwitchComponent>(mWindow);
-	show_help->setState(Settings::getInstance()->getBool("ShowHelpPrompts"));
-	s->addWithLabel("ON-SCREEN HELP", show_help);
-	s->addSaveFunc([show_help] { Settings::getInstance()->setBool("ShowHelpPrompts", show_help->getState()); });
-
-	// enable filters (ForceDisableFilters)
-	auto enable_filter = std::make_shared<SwitchComponent>(mWindow);
-	enable_filter->setState(!Settings::getInstance()->getBool("ForceDisableFilters"));
-	s->addWithLabel("ENABLE FILTERS", enable_filter);
-	s->addSaveFunc([enable_filter] {
-		bool filter_is_enabled = !Settings::getInstance()->getBool("ForceDisableFilters");
-		Settings::getInstance()->setBool("ForceDisableFilters", !enable_filter->getState());
-		if (enable_filter->getState() != filter_is_enabled) ViewController::get()->ReloadAndGoToStart();
-	});
-
-	// hide start menu in Kid Mode
-	auto disable_start = std::make_shared<SwitchComponent>(mWindow);
-	disable_start->setState(Settings::getInstance()->getBool("DisableKidStartMenu"));
-	s->addWithLabel("DISABLE START MENU IN KID MODE", disable_start);
-	s->addSaveFunc([disable_start] { Settings::getInstance()->setBool("DisableKidStartMenu", disable_start->getState()); });
-
+	
 	mWindow->pushGui(s);
 
 }
@@ -408,11 +547,12 @@ void GuiMenu::openOtherSettings()
 	auto s = new GuiSettings(mWindow, "OTHER SETTINGS");
 
 	// maximum vram
+	
 	auto max_vram = std::make_shared<SliderComponent>(mWindow, 0.f, 1000.f, 10.f, "Mb");
 	max_vram->setValue((float)(Settings::getInstance()->getInt("MaxVRAM")));
 	s->addWithLabel("VRAM LIMIT", max_vram);
 	s->addSaveFunc([max_vram] { Settings::getInstance()->setInt("MaxVRAM", (int)Math::round(max_vram->getValue())); });
-
+	
 	// power saver
 	auto power_saver = std::make_shared< OptionListComponent<std::string> >(mWindow, "POWER SAVER MODES", false);
 	std::vector<std::string> modes;
@@ -514,6 +654,7 @@ void GuiMenu::openConfigInput()
 void GuiMenu::openQuitMenu()
 {
 	auto s = new GuiSettings(mWindow, "QUIT");
+	bool isAdvanced = Settings::getInstance()->getBool("AdvancedMenu");
 
 	Window* window = mWindow;
 
@@ -540,7 +681,7 @@ void GuiMenu::openQuitMenu()
 		row.addElement(std::make_shared<TextComponent>(window, "RESTART MVES Cab", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
 		s->addRow(row);
 
-		if(Settings::getInstance()->getBool("ShowExit"))
+		if(Settings::getInstance()->getBool("ShowExit") && isAdvanced)
 		{
 			auto static quit_es_fx = [] {
 				Scripting::fireEvent("quit");
