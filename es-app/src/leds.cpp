@@ -179,7 +179,7 @@ void Turn_Off_All (void)
 	if ( !Led_Controller.Active ) return;
 	
 	int base_reg;
-	base_reg = 6
+	base_reg = 6;
 	
 	for ( int c = 0 ; c < (16 * 4); c += 4 )
 	{
