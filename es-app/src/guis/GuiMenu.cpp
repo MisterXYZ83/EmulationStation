@@ -70,7 +70,7 @@ void GuiMenu::openLedSettings()
 			c &= ~(0xFF000000);
 			c |= (v << 24);
 			
-			Setting::getInstance()->setInt("LedMarqueeColor", v); 
+			Settings::getInstance()->setInt("LedMarqueeColor", v); 
 			
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].W = (c & 0xFF000000) >> 24;
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].R = (c & 0x00FF0000) >> 16;
@@ -92,7 +92,7 @@ void GuiMenu::openLedSettings()
 			c &= ~(0x00FF0000);
 			c |= (v << 16);
 			
-			Setting::getInstance()->setInt("LedMarqueeColor", v); 
+			Settings::getInstance()->setInt("LedMarqueeColor", v); 
 			
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].W = (c & 0xFF000000) >> 24;
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].R = (c & 0x00FF0000) >> 16;
@@ -114,7 +114,7 @@ void GuiMenu::openLedSettings()
 			c &= ~(0x0000FF00);
 			c |= (v << 8);
 			
-			Setting::getInstance()->setInt("LedMarqueeColor", v); 
+			Settings::getInstance()->setInt("LedMarqueeColor", v); 
 			
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].W = (c & 0xFF000000) >> 24;
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].R = (c & 0x00FF0000) >> 16;
@@ -136,7 +136,7 @@ void GuiMenu::openLedSettings()
 			c &= ~(0x000000FF);
 			c |= (v << 0);
 			
-			Setting::getInstance()->setInt("LedMarqueeColor", v); 
+			Settings::getInstance()->setInt("LedMarqueeColor", v); 
 			
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].W = (c & 0xFF000000) >> 24;
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].R = (c & 0x00FF0000) >> 16;
