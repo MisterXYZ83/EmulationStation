@@ -52,9 +52,11 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 
 void GuiMenu::openLedSettings()
 {
+	auto s;
+	
 	if ( Led_Controller.Active && (Led_Controller.Marquee_Index > 0) )
 	{
-		auto s = new GuiSettings(mWindow, "LEDs");
+		s = new GuiSettings(mWindow, "LEDs");
 		int w,r,g,b;
 		int m_color = Settings::getInstance()->getInt("LedMarqueeColor");
 
