@@ -52,11 +52,9 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 
 void GuiMenu::openLedSettings()
 {
-	auto s;
-	
 	if ( Led_Controller.Active && (Led_Controller.Marquee_Index > 0) )
 	{
-		s = new GuiSettings(mWindow, "LEDs");
+		auto s = new GuiSettings(mWindow, "LEDs");
 		int w,r,g,b;
 		int m_color = Settings::getInstance()->getInt("LedMarqueeColor");
 
@@ -157,7 +155,7 @@ void GuiMenu::openLedSettings()
 	for(auto it = scrapers.cbegin(); it != scrapers.cend(); it++)
 		scraper_list->add(*it, *it, *it == Settings::getInstance()->getString("Scraper"));
 
-	s->addWithLabel("SCRAPE FROM", scraper_list);
+	auto s->addWithLabel("SCRAPE FROM", scraper_list);
 	s->addSaveFunc([scraper_list] { Settings::getInstance()->setString("Scraper", scraper_list->getSelected()); });
 
 	// scrape ratings
