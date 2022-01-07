@@ -59,8 +59,8 @@ void GuiMenu::openLedSettings()
 		int m_color = Settings::getInstance()->getInt("LedMarqueeColor");
 
 		w = (m_color & 0xFF000000) >> 24; 
-		auto marquee_w = std::make_shared<SliderComponent>(mWindow, 0.f, 255.0f, 1.f, "%");
-		marquee_w->setValue(w);
+		auto marquee_w = std::make_shared<SliderComponent>(mWindow, 0.f, 255.0f, 1.f, "/255");
+		marquee_w->setValue((float)w);
 		s->addWithLabel("White", marquee_w);
 		s->addSaveFunc([marquee_w] 
 		{ 
@@ -70,7 +70,7 @@ void GuiMenu::openLedSettings()
 			c &= ~(0xFF000000);
 			c |= (v << 24);
 			
-			Settings::getInstance()->setInt("LedMarqueeColor", v); 
+			Settings::getInstance()->setInt("LedMarqueeColor", c); 
 			
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].W = (c & 0xFF000000) >> 24;
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].R = (c & 0x00FF0000) >> 16;
@@ -81,8 +81,8 @@ void GuiMenu::openLedSettings()
 		});
 		
 		r = (m_color & 0x00FF0000) >> 16; 
-		auto marquee_r = std::make_shared<SliderComponent>(mWindow, 0.f, 255.0f, 1.f, "%");
-		marquee_r->setValue(r);
+		auto marquee_r = std::make_shared<SliderComponent>(mWindow, 0.f, 255.0f, 1.f, "/255");
+		marquee_r->setValue((float)r);
 		s->addWithLabel("Red", marquee_r);
 		s->addSaveFunc([marquee_r] 
 		{ 
@@ -92,7 +92,7 @@ void GuiMenu::openLedSettings()
 			c &= ~(0x00FF0000);
 			c |= (v << 16);
 			
-			Settings::getInstance()->setInt("LedMarqueeColor", v); 
+			Settings::getInstance()->setInt("LedMarqueeColor", c); 
 			
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].W = (c & 0xFF000000) >> 24;
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].R = (c & 0x00FF0000) >> 16;
@@ -103,8 +103,8 @@ void GuiMenu::openLedSettings()
 		});
 		
 		g = (m_color & 0x0000FF00) >>  8; 
-		auto marquee_g = std::make_shared<SliderComponent>(mWindow, 0.f, 255.0f, 1.f, "%");
-		marquee_g->setValue(g);
+		auto marquee_g = std::make_shared<SliderComponent>(mWindow, 0.f, 255.0f, 1.f, "/255");
+		marquee_g->setValue((float)g);
 		s->addWithLabel("Green", marquee_g);
 		s->addSaveFunc([marquee_g] 
 		{ 
@@ -114,7 +114,7 @@ void GuiMenu::openLedSettings()
 			c &= ~(0x0000FF00);
 			c |= (v << 8);
 			
-			Settings::getInstance()->setInt("LedMarqueeColor", v); 
+			Settings::getInstance()->setInt("LedMarqueeColor", c); 
 			
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].W = (c & 0xFF000000) >> 24;
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].R = (c & 0x00FF0000) >> 16;
@@ -125,8 +125,8 @@ void GuiMenu::openLedSettings()
 		});
 		
 		b = (m_color & 0x000000FF) >>  0; 
-		auto marquee_b = std::make_shared<SliderComponent>(mWindow, 0.f, 255.0f, 1.f, "%");
-		marquee_b->setValue(b);
+		auto marquee_b = std::make_shared<SliderComponent>(mWindow, 0.f, 255.0f, 1.f, "/255");
+		marquee_b->setValue((float)b);
 		s->addWithLabel("Blue", marquee_b);
 		s->addSaveFunc([marquee_b] 
 		{ 
@@ -136,7 +136,7 @@ void GuiMenu::openLedSettings()
 			c &= ~(0x000000FF);
 			c |= (v << 0);
 			
-			Settings::getInstance()->setInt("LedMarqueeColor", v); 
+			Settings::getInstance()->setInt("LedMarqueeColor", c); 
 			
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].W = (c & 0xFF000000) >> 24;
 			Led_Controller.Strips[Led_Controller.Marquee_Index-1].R = (c & 0x00FF0000) >> 16;
