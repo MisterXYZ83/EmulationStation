@@ -166,11 +166,11 @@ void ViewController::playViewTransition()
 			//colore destinazione
 			int led_col[5] = {0};
 		
-			led_col[0] = getSelected()->getTheme()->getLedColor(0);
-			led_col[1] = getSelected()->getTheme()->getLedColor(1);
-			led_col[2] = getSelected()->getTheme()->getLedColor(2);
-			led_col[3] = getSelected()->getTheme()->getLedColor(3);
-			led_col[4] = getSelected()->getTheme()->getLedColor(4);
+			led_col[0] = mState.system->getTheme()->getLedColor(0);
+			led_col[1] = mState.system->getTheme()->getLedColor(1);
+			led_col[2] = mState.system->getTheme()->getLedColor(2);
+			led_col[3] = mState.system->getTheme()->getLedColor(3);
+			led_col[4] = mState.system->getTheme()->getLedColor(4);
 		
 			for ( int s = 0; s < 4 ; s++ )
 			{
@@ -253,10 +253,17 @@ void ViewController::playViewTransition()
 			this->mCamera.translation() = -target;
 			updateHelpPrompts();
 			setAnimation(new LambdaAnimation(fadeOutFunc, FADE_DURATION), FADE_WAIT, [this]{
-				Led_Controller.R_Old = Led_Controller.R;
-				Led_Controller.G_Old = Led_Controller.G;
-				Led_Controller.B_Old = Led_Controller.B;
-				Led_Controller.W_Old = Led_Controller.W;
+				
+				for ( int s = 0 ; s < 4 ; s++ )
+				{
+					if ( Led_Controller.Strips[s].IsMarquee ) continue;
+					
+					Led_Controller.Strip[s].R_Old = Led_Controller.Strip[s].R;
+					Led_Controller.Strip[s].G_Old = Led_Controller.Strip[s].G;
+					Led_Controller.Strip[s].B_Old = Led_Controller.Strip[s].B;
+					Led_Controller.Strip[s].W_Old = Led_Controller.Strip[s].W;
+				}
+				
 			}, true);
 		});
 

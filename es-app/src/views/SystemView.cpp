@@ -246,14 +246,14 @@ void SystemView::onCursorChanged(const CursorState& state)
 	const float infoStartOpacity = mSystemInfo.getOpacity() / 255.f;
 
 	Animation* infoFadeOut = new LambdaAnimation(
-		[infoStartOpacity, r, g, b, w, this] (float t)
+		[infoStartOpacity, this] (float t)
 	{
 		float c_coeff = Math::lerp(1.0f, 0.0f, t);
 		mSystemInfo.setOpacity((unsigned char)(Math::lerp(infoStartOpacity, 0.f, t) * 255));
 		
 		if (Led_Controller.Active )
 		{
-			for ( int strip = 0 ; strip < 4 ; strip++ )
+			for ( int s = 0 ; s < 4 ; s++ )
 			{	
 				if ( !Led_Controller.Strips[s].IsMarquee ) 
 				{
@@ -313,7 +313,7 @@ void SystemView::onCursorChanged(const CursorState& state)
 		
 
 	Animation* infoFadeIn = new LambdaAnimation(
-		[this, r, g, b](float t)
+		[this](float t)
 	{
 		float c_coeff = Math::lerp(0.0f, 1.0f, t);
 		mSystemInfo.setOpacity((unsigned char)(Math::lerp(0.f, 1.f, t) * 255));
@@ -329,7 +329,7 @@ void SystemView::onCursorChanged(const CursorState& state)
 			{
 				if ( Led_Controller.Strips[s].IsMarquee ) continue;
 			
-				WriteColor(s, (unsigned char)(c_coeff * Led_Controller.Strips[s].R),
+				Write_Strip(s, (unsigned char)(c_coeff * Led_Controller.Strips[s].R),
 			      			  (unsigned char)(c_coeff * Led_Controller.Strips[s].G),
 			      			  (unsigned char)(c_coeff * Led_Controller.Strips[s].B),
 							  (unsigned char)(c_coeff * Led_Controller.Strips[s].W));
