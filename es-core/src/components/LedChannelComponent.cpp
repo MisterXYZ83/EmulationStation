@@ -26,6 +26,7 @@ bool LedChannelComponent::input(InputConfig* config, Input input)
 			if(input.value)
 			{
 				setValue(getValue() + 5.0f);
+				return true;
 			}
 		}
 		else if (config->isMappedLike("rightshoulder", input)) 
@@ -33,6 +34,7 @@ bool LedChannelComponent::input(InputConfig* config, Input input)
 			if(input.value)
 			{
 				setValue(getValue() - 5.0f);
+				return true;
 			}
 		}
 	}
