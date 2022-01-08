@@ -190,19 +190,14 @@ void Write_Channel (int channel, int v)
 
 void Turn_Off_All (void)
 {
+	int base_reg;
+	
 	if ( !Led_Controller.Active ) return;
 	
-	int base_reg;
 	base_reg = 6;
-	
-	for ( int c = 0 ; c < (16 * 4); c += 4 )
-	{
-		pca9685_regs[base_reg + 4 * 0 + 0] = 0x00;	
-		pca9685_regs[base_reg + 4 * 0 + 1] = 0x00;
-		pca9685_regs[base_reg + 4 * 0 + 2] = 0x00;
-		pca9685_regs[base_reg + 4 * 0 + 3] = 0x00;
-	}
-
+	//azzero tutto
+	memset(&pca9685_regs[base_reg], 0, 16*4);
+	//scrivo
 	Write_I2C_Data(0x40, base_reg, &pca9685_regs[base_reg], 64);
 }
 

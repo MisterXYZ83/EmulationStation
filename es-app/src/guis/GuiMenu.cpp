@@ -30,19 +30,20 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 {
 	bool isFullUI = UIModeController::getInstance()->isUIModeFull();
 	bool isAdvanced = Settings::getInstance()->getBool("AdvancedMenu");
+	bool ledMenu = Settings::getInstance()->getBool("ShowLedMenu");
 	
 	if (isFullUI) {
 		if ( isAdvanced ) addEntry("SCRAPER", 0x777777FF, true, [this] { openScraperSettings(); });
-		if ( isAdvanced ) addEntry("SOUND SETTINGS", 0x777777FF, true, [this] { openSoundSettings(); });
+		addEntry("SOUND SETTINGS", 0x777777FF, true, [this] { openSoundSettings(); });
 		addEntry("UI SETTINGS", 0x777777FF, true, [this] { openUISettings(); });
 		if ( isAdvanced ) addEntry("GAME COLLECTION SETTINGS", 0x777777FF, true, [this] { openCollectionSystemSettings(); });
 		if ( isAdvanced ) addEntry("OTHER SETTINGS", 0x777777FF, true, [this] { openOtherSettings(); });
+		if ( ledMenu ) addEntry("LEDs", 0x777777FF, true, [this] {openLedSettings(); });
 		if ( isAdvanced ) addEntry("CONFIGURE INPUT", 0x777777FF, true, [this] { openConfigInput(); });
 	} else if ( isAdvanced )  {
 		addEntry("SOUND SETTINGS", 0x777777FF, true, [this] { openSoundSettings(); });
 	}
 	
-	addEntry("LEDs", 0x777777FF, true, [this] {openLedSettings(); });
 	addEntry("QUIT", 0x777777FF, true, [this] {openQuitMenu(); });
 
 	addChild(&mMenu);
