@@ -14,15 +14,28 @@ LedChannelComponent::LedChannelComponent(Window* window, int channel) : SliderCo
 bool LedChannelComponent::input(InputConfig* config, Input input)
 {
 	//aggiorno lo stato del led
-	if(config->isMappedLike("a", input))
+	if ( Led_Controller.Active )
 	{
-		if ( Led_Controller.Active )
+		if (config->isMappedLike("a", input))
 		{
 			Write_Channel(mChannel, (int)getValue());
-		}	
-		
-		return true;
+			return true;
+		}
+		else if (config->isMappedLike("leftshoulder", input))
+		{
+			if(input.value)
+			{
+				setValue(getValue() + 5.0f);
+			}
+		}
+		else if (config->isMappedLike("rightshoulder", input)) 
+		{
+			if(input.value)
+			{
+				setValue(getValue() - 5.0f);
+			}
+		}
 	}
-	
+
 	return SliderComponent::input(config, input);
 }
