@@ -18,7 +18,7 @@ bool LedChannelComponent::input(InputConfig* config, Input input)
 	{
 		if ( Led_Controller.Active )
 		{
-			Write_Channel(mChannel, (int)mValue);
+			Write_Channel(mChannel, (int)getValue());
 		}	
 		
 		return true;
