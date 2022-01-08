@@ -28,15 +28,3 @@ bool LedChannelComponent::input(InputConfig* config, Input input)
 	
 	return SliderComponent::input(config, input);
 }
-
-void LedChannelComponent::setValue(float value)
-{
-	mValue = value;
-	
-	if(mValue < mMin)
-		mValue = mMin;
-	else if(mValue > mMax)
-		mValue = mMax;
-
-	SliderComponent::onValueChanged();
-}

@@ -16,8 +16,6 @@ public:
 	//Minimum value (far left of the slider), maximum value (far right of the slider), increment size (how much just pressing L/R moves by), unit to display (optional).
 	LedChannelComponent(Window* window, int channel);
 
-	void setValue(float val) override;
-
 	bool input(InputConfig* config, Input input) override;
 
 private:
