@@ -6,7 +6,7 @@
 #define MOVE_REPEAT_DELAY 500
 #define MOVE_REPEAT_RATE 40
 
-LedChannelComponent::LedChannelComponent(Window* window, int channel) : SliderComponent(window, 0.0f, 255.0f, 1.0f, "/255"), mMoveRate(0), mKnob(window), mSuffix(suffix)
+LedChannelComponent::LedChannelComponent(Window* window, int channel) : SliderComponent(window, 0.0f, 255.0f, 1.0f, "/255")
 {
 	mChannel = channel;
 }
