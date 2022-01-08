@@ -175,18 +175,17 @@ void Write_Strip(int strip, int r, int g, int b, int w)
 
 void Write_Channel (int channel, int v)
 {
-	int reg_addr;
 	int base_reg;
 	base_reg = 6 + channel * 4;
 	
 	v *= MAX_PWM / 256;
 	
-	pca9685_regs[base_reg + 4 * 0 + 0] = 0x00;	
-	pca9685_regs[base_reg + 4 * 0 + 1] = 0x00;
-	pca9685_regs[base_reg + 4 * 0 + 2] = (v & 0x00FF);
-	pca9685_regs[base_reg + 4 * 0 + 3] = (v & 0x0F00) >> 8;
+	pca9685_regs[base_reg + 0] = 0x00;	
+	pca9685_regs[base_reg + 1] = 0x00;
+	pca9685_regs[base_reg + 2] = (v & 0x00FF);
+	pca9685_regs[base_reg + 3] = (v & 0x0F00) >> 8;
 	
-	Write_I2C_Data(0x40, base_reg, &pca9685_regs[base_reg], 16);
+	Write_I2C_Data(0x40, base_reg, &pca9685_regs[base_reg], 4);
 }
 
 void Turn_Off_All (void)
