@@ -361,9 +361,9 @@ int main(int argc, char* argv[])
 
 		if (splashScreen)
 		{
-			std::string progressText = "Loading...";
+			std::string progressText = "Caricamento...";
 			if (splashScreenProgress)
-				progressText = "Loading system config...";
+				progressText = "Caricamento sistemi...";
 			window.renderLoadingScreen(progressText);
 		}
 	}
